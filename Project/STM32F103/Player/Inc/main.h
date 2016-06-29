@@ -4,9 +4,15 @@
 
 /* Includes ------------------------------------------------------------------*/
 #include "stm32f1xx_nucleo.h"
+#include "stm32_adafruit_sd.h"
 #include "Debug.h"
 #include <stdio.h>
 #include <stdlib.h>
+
+/* FatFs includes component */
+#include "ff_gen_drv.h"
+#include "sd_diskio.h"
+#include "fatfs_storage.h"
 
 
 /* Exported types ------------------------------------------------------------*/

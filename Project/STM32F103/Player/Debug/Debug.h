@@ -7,8 +7,8 @@
 
 #define MAX_RX_STRLEN 60            //Maximum Length of string which can be recieved from Consol
 
-extern char timestamp[];
-extern int  sysTicks;
+extern char     timestamp[];
+extern int      sysTicks;
 extern sys_time sysTime;
 
 /* Use in code only for Logging of Fatal Errors */

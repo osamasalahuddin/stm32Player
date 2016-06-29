@@ -332,7 +332,7 @@
               <MiscControls>--C99 -Ono_fp_formats</MiscControls>
               <Define>USE_HAL_DRIVER,STM32F103xB,USE_STM32F1xx_NUCLEO,SD_GET_STATUS_WORKAROUND, TRACE_ENABLE, ERROR_ENABLE, WARNING_ENABLE</Define>
               <Undefine></Undefine>
-              <IncludePath>../Inc;../../../../Drivers/CMSIS/Device/ST/STM32F1xx/Include;../../../../Drivers/STM32F1xx_HAL_Driver/Inc;../../../../Drivers/BSP/STM32F1xx_Nucleo;../../../../Drivers/BSP/Adafruit_Shield;../../../../Middlewares/Third_Party/FatFs/src;../../../../Middlewares/Third_Party/FatFs/src/drivers;../../../../Drivers/BSP/Components;../../../../Drivers/BSP/Components/Common;..\Debug;..\..\..\..\Drivers\CMSIS\Include</IncludePath>
+              <IncludePath>../Inc;../../../../Drivers/CMSIS/Device/ST/STM32F1xx/Include;../../../../Drivers/STM32F1xx_HAL_Driver/Inc;../../../../Drivers/BSP/STM32F1xx_Nucleo;../../../../Drivers/BSP/Components;../../../../Drivers/BSP/Components/Common;..\Debug;..\..\..\..\Drivers\CMSIS\Include</IncludePath>
             </VariousControls>
           </Cads>
           <Aads>
@@ -448,47 +448,12 @@
           </Files>
         </Group>
         <Group>
-          <GroupName>Drivers/BSP/Adafruit_Shield</GroupName>
-          <Files>
-            <File>
-              <FileName>stm32_adafruit_lcd.c</FileName>
-              <FileType>1</FileType>
-              <FilePath>../../../../Drivers/BSP/Adafruit_Shield/stm32_adafruit_lcd.c</FilePath>
-            </File>
-            <File>
-              <FileName>stm32_adafruit_sd.c</FileName>
-              <FileType>1</FileType>
-              <FilePath>../../../../Drivers/BSP/Adafruit_Shield/stm32_adafruit_sd.c</FilePath>
-            </File>
-          </Files>
-        </Group>
-        <Group>
-          <GroupName>Doc</GroupName>
-          <Files>
-            <File>
-              <FileName>readme.txt</FileName>
-              <FileType>5</FileType>
-              <FilePath>../readme.txt</FilePath>
-            </File>
-          </Files>
-        </Group>
-        <Group>
           <GroupName>Demo/MDK-ARM</GroupName>
           <Files>
             <File>
               <FileName>startup_stm32f103xb.s</FileName>
               <FileType>2</FileType>
               <FilePath>startup_stm32f103xb.s</FilePath>
-            </File>
-          </Files>
-        </Group>
-        <Group>
-          <GroupName>Middlewares/FatFs/Drivers</GroupName>
-          <Files>
-            <File>
-              <FileName>sd_diskio.c</FileName>
-              <FileType>1</FileType>
-              <FilePath>../../../../Middlewares/Third_Party/FatFs/src/drivers/sd_diskio.c</FilePath>
             </File>
           </Files>
         </Group>
@@ -501,11 +466,6 @@
               <FilePath>../Src/stm32f1xx_it.c</FilePath>
             </File>
             <File>
-              <FileName>fatfs_storage.c</FileName>
-              <FileType>1</FileType>
-              <FilePath>../Src/fatfs_storage.c</FilePath>
-            </File>
-            <File>
               <FileName>main.c</FileName>
               <FileType>1</FileType>
               <FilePath>../Src/main.c</FilePath>
@@ -514,36 +474,6 @@
               <FileName>stm32f1xx_hal_msp.c</FileName>
               <FileType>1</FileType>
               <FilePath>..\Src\stm32f1xx_hal_msp.c</FilePath>
-            </File>
-          </Files>
-        </Group>
-        <Group>
-          <GroupName>Drivers/BSP/Components</GroupName>
-          <Files>
-            <File>
-              <FileName>st7735.c</FileName>
-              <FileType>1</FileType>
-              <FilePath>../../../../Drivers/BSP/Components/st7735/st7735.c</FilePath>
-            </File>
-          </Files>
-        </Group>
-        <Group>
-          <GroupName>Middlewares/FatFs/Core</GroupName>
-          <Files>
-            <File>
-              <FileName>ff_gen_drv.c</FileName>
-              <FileType>1</FileType>
-              <FilePath>../../../../Middlewares/Third_Party/FatFs/src/ff_gen_drv.c</FilePath>
-            </File>
-            <File>
-              <FileName>ff.c</FileName>
-              <FileType>1</FileType>
-              <FilePath>../../../../Middlewares/Third_Party/FatFs/src/ff.c</FilePath>
-            </File>
-            <File>
-              <FileName>diskio.c</FileName>
-              <FileType>1</FileType>
-              <FilePath>../../../../Middlewares/Third_Party/FatFs/src/diskio.c</FilePath>
             </File>
           </Files>
         </Group>

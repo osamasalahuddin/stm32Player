@@ -18,6 +18,8 @@
 /* Private macro -------------------------------------------------------------*/
 /* Private variables ---------------------------------------------------------*/
 uint8_t BlinkSpeed = 0, str[20];
+FATFS SD_FatFs;  /* File system object for SD card logical drive */
+char SD_Path[4]; /* SD card logical drive path */
 
 /* Private function prototypes -----------------------------------------------*/
 void SystemClock_Config(void);
@@ -33,15 +35,15 @@ static void LED2_Blink(void);
 int main(void)
 {  
     /* STM32F103xB HAL library initialization:
-         - Configure the Flash prefetch
-         - Systick timer is configured by default as source of time base, but user 
-           can eventually implement his proper time base source (a general purpose 
-           timer for example or other time source), keeping in mind that Time base 
-           duration should be kept 1ms since PPP_TIMEOUT_VALUEs are defined and 
-           handled in milliseconds basis.
-         - Set NVIC Group Priority to 4
-         - Low Level Initialization
-       */
+       - Configure the Flash prefetch
+       - Systick timer is configured by default as source of time base, but user 
+         can eventually implement his proper time base source (a general purpose 
+         timer for example or other time source), keeping in mind that Time base 
+         duration should be kept 1ms since PPP_TIMEOUT_VALUEs are defined and 
+         handled in milliseconds basis.
+       - Set NVIC Group Priority to 4
+       - Low Level Initialization
+     */
     HAL_Init();
 
     /* Configure the system clock = 64 MHz */
@@ -120,6 +122,35 @@ void SystemClock_Config(void)
   }
 }
 
+
+/**
+  * @brief  SD Card Configuration.
+  * @param  None
+  * @retval None
+  */
+static void SDCard_Config(void)
+{
+    uint32_t counter = 0;
+
+    if(FATFS_LinkDriver(&SD_Driver, SD_Path) == 0)
+    {
+        /* Initialize the SD mounted on adafruit 1.8" TFT shield */
+        if(BSP_SD_Init() != MSD_OK)
+        {
+            ERROR("BSP_SD_INIT_FAILED");
+        }  
+
+        /* Check the mounted device */
+        if(f_mount(&SD_FatFs, (TCHAR const*)"/", 0) != FR_OK)
+        {
+            ERROR("FATFS_NOT_MOUNTED");
+        }
+        else
+        {
+            /* Initialize the Directory Files pointers (heap) */
+        }
+    }
+}
 
 
 
