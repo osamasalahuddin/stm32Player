@@ -1,8 +1,17 @@
 # Object files
+*.axf
+*.crf
 *.o
 *.ko
 *.obj
 *.elf
+
+# Mapf files
+*.map
+*.lnp
+
+# Scatter Files
+*.sct
 
 # Precompiled Headers
 *.gch
@@ -24,6 +33,7 @@
 *.exe
 *.out
 *.app
+*.iex
 *.i*86
 *.x86_64
 *.hex
@@ -31,3 +41,8 @@
 # Debug files
 *.dSYM/
 *.su
+*.d
+*.dep
+
+./Project/STM32F103/Player/MDK-ARM/STM32F103RB_Nucleo/*.*
+*.DELL
