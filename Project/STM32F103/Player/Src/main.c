@@ -49,6 +49,8 @@ int main(void)
        - Set NVIC Group Priority to 4
        - Low Level Initialization
      */
+    uint8_t chipID;
+
     HAL_Init();
 
     /* Configure the system clock = 64 MHz */
@@ -69,12 +71,15 @@ int main(void)
                      GPIOA,GPIO_PIN_7,
                      5000);
 
+    chipID = VS1053_sci_read(&vs1053,0x0001);
+
+    TRACE2("VS1053 Chip ID: %d",chipID);
+
     VS1053_sci_write(&vs1053,0x3,0xa000);
     HAL_Delay(1);
     while(!HAL_GPIO_ReadPin(vs1053.DREQport,vs1053.DREQpin));
 
-    TRACE("SCI Command Sent");
-    
+
     /* ToDo: Check the availability of the SD card here. */
     if(0)
     {
@@ -120,7 +125,7 @@ void SystemClock_Config(void)
     oscinitstruct.LSEState        = RCC_LSE_OFF;
     oscinitstruct.HSIState        = RCC_HSI_ON;
     oscinitstruct.HSICalibrationValue = RCC_HSICALIBRATION_DEFAULT;
-    oscinitstruct.HSEPredivValue    = RCC_HSE_PREDIV_DIV1;
+    oscinitstruct.HSEPredivValue  = RCC_HSE_PREDIV_DIV1;
     oscinitstruct.PLL.PLLState    = RCC_PLL_ON;
     oscinitstruct.PLL.PLLSource   = RCC_PLLSOURCE_HSI_DIV2;
     oscinitstruct.PLL.PLLMUL      = RCC_PLL_MUL16;
@@ -132,9 +137,9 @@ void SystemClock_Config(void)
 
     /* Select PLL as system clock source and configure the HCLK, PCLK1 and PCLK2 
        clocks dividers */
-    clkinitstruct.ClockType = (RCC_CLOCKTYPE_SYSCLK | RCC_CLOCKTYPE_HCLK | RCC_CLOCKTYPE_PCLK1 | RCC_CLOCKTYPE_PCLK2);
-    clkinitstruct.SYSCLKSource = RCC_SYSCLKSOURCE_PLLCLK;
-    clkinitstruct.AHBCLKDivider = RCC_SYSCLK_DIV1;
+    clkinitstruct.ClockType      = (RCC_CLOCKTYPE_SYSCLK | RCC_CLOCKTYPE_HCLK | RCC_CLOCKTYPE_PCLK1 | RCC_CLOCKTYPE_PCLK2);
+    clkinitstruct.SYSCLKSource   = RCC_SYSCLKSOURCE_PLLCLK;
+    clkinitstruct.AHBCLKDivider  = RCC_SYSCLK_DIV1;
     clkinitstruct.APB2CLKDivider = RCC_HCLK_DIV1;
     clkinitstruct.APB1CLKDivider = RCC_HCLK_DIV2;  
     if (HAL_RCC_ClockConfig(&clkinitstruct, FLASH_LATENCY_2)!= HAL_OK)
