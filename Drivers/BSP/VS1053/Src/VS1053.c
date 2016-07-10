@@ -13,6 +13,7 @@ void VS1053_configure(VS1053_InitTypeDef* vs1053,SPI_HandleTypeDef* hspi,
                       uint32_t timeout)
 {
     uint8_t tempData    = 0xFF;
+
     vs1053->hspi        = hspi;
     vs1053->DREQport    = DREQport;
     vs1053->DREQpin     = DREQpin;
@@ -32,7 +33,7 @@ void VS1053_configure(VS1053_InitTypeDef* vs1053,SPI_HandleTypeDef* hspi,
 
     /* Configure the SCI pins */
     gpioinitstruct.Mode   = GPIO_MODE_OUTPUT_PP;
-    gpioinitstruct.Pull   = GPIO_PULLUP;
+    gpioinitstruct.Pull   = GPIO_NOPULL;
     gpioinitstruct.Speed  = GPIO_SPEED_FREQ_HIGH;
     gpioinitstruct.Pin    = vs1053->CSpin;
     HAL_GPIO_Init(vs1053->CSport, &gpioinitstruct);
@@ -42,17 +43,17 @@ void VS1053_configure(VS1053_InitTypeDef* vs1053,SPI_HandleTypeDef* hspi,
     HAL_GPIO_Init(vs1053->RSTport, &gpioinitstruct);
 
     gpioinitstruct.Mode   = GPIO_MODE_INPUT;
-    gpioinitstruct.Pull   = GPIO_PULLUP;
-    gpioinitstruct.Speed  = GPIO_SPEED_FREQ_HIGH;
+    gpioinitstruct.Pull   = GPIO_NOPULL;
+    gpioinitstruct.Speed  = GPIO_SPEED_FREQ_MEDIUM;
     gpioinitstruct.Pin    = vs1053->DREQpin;
     HAL_GPIO_Init(vs1053->DREQport, &gpioinitstruct);
     
     /* Put VS1053 in reset state */
-    HAL_GPIO_WritePin(vs1053->RSTport,vs1053->RSTpin,GPIO_PIN_SET);     //RESET High
-    HAL_Delay(1);
+    HAL_GPIO_WritePin(vs1053->RSTport,vs1053->RSTpin,GPIO_PIN_RESET);     //RESET Low
+    HAL_Delay(10);
 
     /* Send Dummy Data on SPI bus */
-    if(HAL_OK != HAL_SPI_Transmit(vs1053->hspi,&tempData,1,0xFF))
+    if(HAL_OK != HAL_SPI_Transmit(vs1053->hspi,&tempData,1,vs1053->timeout))
     {
         ERROR("SPI TX FAILED");
         return;
@@ -61,11 +62,11 @@ void VS1053_configure(VS1053_InitTypeDef* vs1053,SPI_HandleTypeDef* hspi,
     /* Release VS1053 from reset state */
     HAL_GPIO_WritePin(vs1053->CSport, vs1053->CSpin, GPIO_PIN_SET);     //xCS High
     HAL_GPIO_WritePin(vs1053->DCSport,vs1053->DCSpin,GPIO_PIN_SET);     //xDCS High
-    HAL_GPIO_WritePin(vs1053->RSTport,vs1053->RSTpin,GPIO_PIN_RESET);   //RESET Low
+    HAL_GPIO_WritePin(vs1053->RSTport,vs1053->RSTpin,GPIO_PIN_SET);     //RESET High
 
-    //while(!HAL_GPIO_ReadPin(vs1053->DREQport,vs1053->DREQpin));
+    while(!HAL_GPIO_ReadPin(vs1053->DREQport,vs1053->DREQpin));
 
-    TRACE("VS1053 Reset Loop Complete");
+    TRACE("VS1053 Initialization Complete");
 
     vs1053->initialised=1;
     vs1053->playback=0;
@@ -152,8 +153,8 @@ void VS1053_sci_write(VS1053_InitTypeDef* vs1053,uint8_t addr,uint16_t data)
             return;
         }
         HAL_GPIO_WritePin(vs1053->CSport,vs1053->CSpin,GPIO_PIN_SET);
-        //while((HAL_GPIO_ReadPin(vs1053->DREQport,vs1053->DREQpin))); //Wait while DREQ is high
-        //while(!(HAL_GPIO_ReadPin(vs1053->DREQport,vs1053->DREQpin))); //Wait while DREQ is low
+        while((HAL_GPIO_ReadPin(vs1053->DREQport,vs1053->DREQpin))); //Wait while DREQ is high
+        while(!(HAL_GPIO_ReadPin(vs1053->DREQport,vs1053->DREQpin))); //Wait while DREQ is low
     }
 }
 
@@ -165,14 +166,27 @@ uint16_t VS1053_sci_read(VS1053_InitTypeDef* vs1053,uint8_t addr)
     uint16_t result=0;
     if(vs1053->initialised)
     {
-        while(!(HAL_GPIO_ReadPin(vs1053->DREQport,vs1053->DREQpin))); //Wait while DREQ is low
+        
         HAL_GPIO_WritePin(vs1053->DCSport,vs1053->DCSpin,GPIO_PIN_SET);
         HAL_GPIO_WritePin(vs1053->CSport,vs1053->CSpin,GPIO_PIN_SET);
         HAL_GPIO_WritePin(vs1053->CSport,vs1053->CSpin,GPIO_PIN_RESET);
 
-        HAL_SPI_Transmit(vs1053->hspi,&cmd,1,vs1053->timeout);//Read command
-        HAL_SPI_Transmit(vs1053->hspi,&addr,1,vs1053->timeout);
-        HAL_SPI_Receive(vs1053->hspi,received,2,vs1053->timeout);
+        if(HAL_OK != HAL_SPI_Transmit(vs1053->hspi,&cmd,1,vs1053->timeout))//Read command
+        {
+            ERROR("SPI TX FAILED");
+            return 0;
+        }
+        if(HAL_OK != HAL_SPI_Transmit(vs1053->hspi,&addr,1,vs1053->timeout))
+        {
+            ERROR("SPI TX FAILED");
+            return 0;
+        }
+        HAL_Delay(1);
+        if(HAL_OK != HAL_SPI_Receive(vs1053->hspi,received,2,vs1053->timeout))
+        {
+            ERROR("SPI RX FAILED");
+            return 0;
+        }
         HAL_GPIO_WritePin(vs1053->CSport,vs1053->CSpin,GPIO_PIN_SET);
     }
     result=received[0]<<8|received[1];

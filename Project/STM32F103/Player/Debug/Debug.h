@@ -76,8 +76,26 @@ extern sys_time sysTime;
         );                          \
         printf(x);                  \
         printf("\r\n");
+#define TRACE2(x,y)                 \
+        sysTime = get_sysTime();    \
+        sprintf(                    \
+        timestamp,                  \
+        "%d:%02d:%02d.%03d",        \
+        sysTime.hr,                 \
+        sysTime.min,                \
+        sysTime.sec,                \
+        sysTime.milli);             \
+        printf(                     \
+        "[%s]%s(%d): ",             \
+        timestamp,                  \
+        __FILE__,                   \
+        __LINE__                    \
+        );                          \
+        printf(x,y);                \
+        printf("\r\n");
 #else
 #define TRACE(x)
+#define TRACE2(x)
 #endif
 
 void init_debug(void);
