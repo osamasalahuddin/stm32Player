@@ -4,10 +4,10 @@
 
 /* Includes ------------------------------------------------------------------*/
 #include "stm32f1xx_nucleo.h"
-#include "stm32_adafruit_sd.h"
 #include "Debug.h"
 #include <stdio.h>
 #include <stdlib.h>
+#include "VS1053.h"
 
 /* FatFs includes component */
 #include "ff_gen_drv.h"
@@ -36,5 +36,26 @@
 /* Definition for USARTx's NVIC */
 #define USARTx_IRQn                      USART2_IRQn
 #define USARTx_IRQHandler                USART2_IRQHandler
+
+
+
+/* Definition for SPIx clock resources */
+#define SPIx                             SPI2
+#define SPIx_CLK_ENABLE()                __HAL_RCC_SPI2_CLK_ENABLE()
+#define SPIx_SCK_GPIO_CLK_ENABLE()       __HAL_RCC_GPIOB_CLK_ENABLE()
+#define SPIx_MISO_GPIO_CLK_ENABLE()      __HAL_RCC_GPIOB_CLK_ENABLE()
+#define SPIx_MOSI_GPIO_CLK_ENABLE()      __HAL_RCC_GPIOB_CLK_ENABLE()
+
+/* Definition for SPIx Pins */
+#define SPIx_SCK_PIN                     GPIO_PIN_13
+#define SPIx_SCK_GPIO_PORT               GPIOB
+#define SPIx_MISO_PIN                    GPIO_PIN_14
+#define SPIx_MISO_GPIO_PORT              GPIOB
+#define SPIx_MOSI_PIN                    GPIO_PIN_15
+#define SPIx_MOSI_GPIO_PORT              GPIOB
+
+/* Definition for SPIx's NVIC */
+#define SPIx_IRQn                        SPI2_IRQn
+#define SPIx_IRQHandler                  SPI2_IRQHandler
 
 #endif /* __MAIN_H__ */

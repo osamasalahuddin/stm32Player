@@ -23,7 +23,7 @@ extern sys_time sysTime;
         sysTime.sec,                \
         sysTime.milli);             \
         printf(                     \
-        "[ERROR][%s]%s(%d): ",      \
+        "[%s]%s(%d): [ERROR] ",     \
         timestamp,                  \
         __FILE__,                   \
         __LINE__                    \
@@ -46,7 +46,7 @@ extern sys_time sysTime;
         sysTime.sec,                \
         sysTime.milli);             \
         printf(                     \
-        "[WARNING][%s]%s(%d): ",    \
+        "[%s]%s(%d): [WARNING] ",   \
         timestamp,                  \
         __FILE__,                   \
         __LINE__                    \

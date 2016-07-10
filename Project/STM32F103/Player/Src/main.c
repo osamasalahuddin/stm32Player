@@ -16,14 +16,19 @@
 /* Private define ------------------------------------------------------------*/
 
 /* Private macro -------------------------------------------------------------*/
+
 /* Private variables ---------------------------------------------------------*/
 uint8_t BlinkSpeed = 0, str[20];
-FATFS SD_FatFs;  /* File system object for SD card logical drive */
-char SD_Path[4]; /* SD card logical drive path */
+FATFS SD_FatFs;             /* File system object for SD card logical drive   */
+char SD_Path[4];            /* SD card logical drive path                     */
+VS1053_InitTypeDef vs1053;  /* VS1053 Handler Object                          */
+SPI_HandleTypeDef SpiHandle;/* SPI handler declaration                        */
 
 /* Private function prototypes -----------------------------------------------*/
 void SystemClock_Config(void);
 static void LED2_Blink(void);
+static void SPI_Config(void);
+static void SDCard_Config(void);
 
 /* Private functions ---------------------------------------------------------*/
 
@@ -53,21 +58,38 @@ int main(void)
 
     TRACE("Hello World");
 
+    /* Initialize SPI */
+    SPI_Config();
+
+    /* Initialize VS1053 Chip */
+    VS1053_configure(&vs1053,&SpiHandle,
+                     GPIOA,GPIO_PIN_1,
+                     GPIOA,GPIO_PIN_6,
+                     GPIOA,GPIO_PIN_4,
+                     GPIOA,GPIO_PIN_7,
+                     5000);
+
+    VS1053_sci_write(&vs1053,0x3,0xa000);
+    HAL_Delay(1);
+    while(!HAL_GPIO_ReadPin(vs1053.DREQport,vs1053.DREQpin));
+
+    TRACE("SCI Command Sent");
+    
     /* ToDo: Check the availability of the SD card here. */
     if(0)
     {
-      /* Configure SD card */
+        /* Configure SD card */
+        SDCard_Config();
     }
     else /* SD Card not mounted */
-    {   
-      ERROR("Failed to load SD Card");
-      LED2_Blink();
-    } 
+    {
+        ERROR("Failed to load SD Card");
+        LED2_Blink();
+    }
 
     /* Infinite loop */
     while (1)
-    {
-    }
+    {;}
 }
 
 /**
@@ -86,40 +108,40 @@ int main(void)
   */
 void SystemClock_Config(void)
 {
-  RCC_ClkInitTypeDef clkinitstruct = {0};
-  RCC_OscInitTypeDef oscinitstruct = {0};
-  
-  /* Configure PLL ------------------------------------------------------*/
-  /* PLL configuration: PLLCLK = (HSI / 2) * PLLMUL = (8 / 2) * 16 = 64 MHz */
-  /* PREDIV1 configuration: PREDIV1CLK = PLLCLK / HSEPredivValue = 64 / 1 = 64 MHz */
-  /* Enable HSI and activate PLL with HSi_DIV2 as source */
-  oscinitstruct.OscillatorType  = RCC_OSCILLATORTYPE_HSI;
-  oscinitstruct.HSEState        = RCC_HSE_OFF;
-  oscinitstruct.LSEState        = RCC_LSE_OFF;
-  oscinitstruct.HSIState        = RCC_HSI_ON;
-  oscinitstruct.HSICalibrationValue = RCC_HSICALIBRATION_DEFAULT;
-  oscinitstruct.HSEPredivValue    = RCC_HSE_PREDIV_DIV1;
-  oscinitstruct.PLL.PLLState    = RCC_PLL_ON;
-  oscinitstruct.PLL.PLLSource   = RCC_PLLSOURCE_HSI_DIV2;
-  oscinitstruct.PLL.PLLMUL      = RCC_PLL_MUL16;
-  if (HAL_RCC_OscConfig(&oscinitstruct)!= HAL_OK)
-  {
-    /* Initialization Error */
-    while(1); 
-  }
+    RCC_ClkInitTypeDef clkinitstruct = {0};
+    RCC_OscInitTypeDef oscinitstruct = {0};
 
-  /* Select PLL as system clock source and configure the HCLK, PCLK1 and PCLK2 
-     clocks dividers */
-  clkinitstruct.ClockType = (RCC_CLOCKTYPE_SYSCLK | RCC_CLOCKTYPE_HCLK | RCC_CLOCKTYPE_PCLK1 | RCC_CLOCKTYPE_PCLK2);
-  clkinitstruct.SYSCLKSource = RCC_SYSCLKSOURCE_PLLCLK;
-  clkinitstruct.AHBCLKDivider = RCC_SYSCLK_DIV1;
-  clkinitstruct.APB2CLKDivider = RCC_HCLK_DIV1;
-  clkinitstruct.APB1CLKDivider = RCC_HCLK_DIV2;  
-  if (HAL_RCC_ClockConfig(&clkinitstruct, FLASH_LATENCY_2)!= HAL_OK)
-  {
-    /* Initialization Error */
-    while(1); 
-  }
+    /* Configure PLL ------------------------------------------------------*/
+    /* PLL configuration: PLLCLK = (HSI / 2) * PLLMUL = (8 / 2) * 16 = 64 MHz */
+    /* PREDIV1 configuration: PREDIV1CLK = PLLCLK / HSEPredivValue = 64 / 1 = 64 MHz */
+    /* Enable HSI and activate PLL with HSi_DIV2 as source */
+    oscinitstruct.OscillatorType  = RCC_OSCILLATORTYPE_HSI;
+    oscinitstruct.HSEState        = RCC_HSE_OFF;
+    oscinitstruct.LSEState        = RCC_LSE_OFF;
+    oscinitstruct.HSIState        = RCC_HSI_ON;
+    oscinitstruct.HSICalibrationValue = RCC_HSICALIBRATION_DEFAULT;
+    oscinitstruct.HSEPredivValue    = RCC_HSE_PREDIV_DIV1;
+    oscinitstruct.PLL.PLLState    = RCC_PLL_ON;
+    oscinitstruct.PLL.PLLSource   = RCC_PLLSOURCE_HSI_DIV2;
+    oscinitstruct.PLL.PLLMUL      = RCC_PLL_MUL16;
+    if (HAL_RCC_OscConfig(&oscinitstruct)!= HAL_OK)
+    {
+      /* Initialization Error */
+      while(1); 
+    }
+
+    /* Select PLL as system clock source and configure the HCLK, PCLK1 and PCLK2 
+       clocks dividers */
+    clkinitstruct.ClockType = (RCC_CLOCKTYPE_SYSCLK | RCC_CLOCKTYPE_HCLK | RCC_CLOCKTYPE_PCLK1 | RCC_CLOCKTYPE_PCLK2);
+    clkinitstruct.SYSCLKSource = RCC_SYSCLKSOURCE_PLLCLK;
+    clkinitstruct.AHBCLKDivider = RCC_SYSCLK_DIV1;
+    clkinitstruct.APB2CLKDivider = RCC_HCLK_DIV1;
+    clkinitstruct.APB1CLKDivider = RCC_HCLK_DIV2;  
+    if (HAL_RCC_ClockConfig(&clkinitstruct, FLASH_LATENCY_2)!= HAL_OK)
+    {
+        /* Initialization Error */
+        while(1); 
+    }
 }
 
 
@@ -130,15 +152,13 @@ void SystemClock_Config(void)
   */
 static void SDCard_Config(void)
 {
-    uint32_t counter = 0;
-
     if(FATFS_LinkDriver(&SD_Driver, SD_Path) == 0)
     {
         /* Initialize the SD mounted on adafruit 1.8" TFT shield */
         if(BSP_SD_Init() != MSD_OK)
         {
             ERROR("BSP_SD_INIT_FAILED");
-        }  
+        }
 
         /* Check the mounted device */
         if(f_mount(&SD_FatFs, (TCHAR const*)"/", 0) != FR_OK)
@@ -153,7 +173,6 @@ static void SDCard_Config(void)
 }
 
 
-
 /**
   * @brief  Blinks LED2 with two frequencies depending on User press button.
   * @param  None
@@ -161,40 +180,73 @@ static void SDCard_Config(void)
   */
 static void LED2_Blink(void)
 {
-  /* Configure LED2 on Nucleo */
-  BSP_LED_Init(LED2);
+    /* Configure LED2 on Nucleo */
+    BSP_LED_Init(LED2);
 
-  /* Configure the User Button in EXTI Mode */
-  BSP_PB_Init(BUTTON_USER, BUTTON_MODE_EXTI);
+    /* Configure the User Button in EXTI Mode */
+    BSP_PB_Init(BUTTON_USER, BUTTON_MODE_EXTI);
   
-  /* Initiate BlinkSpeed variable */ 
-  BlinkSpeed = 0;  
+    /* Initiate BlinkSpeed variable */ 
+    BlinkSpeed = 0;  
   
-  /* Infinite loop */
-  while(1)
-  {
-    /* Test on blink speed */
-    if(BlinkSpeed == 0)
+    /* Infinite loop */
+    while(1)
     {
-      BSP_LED_Toggle(LED2);
-      /* Wait for 500ms */      
-      HAL_Delay(500);      
-    }      
-    else if(BlinkSpeed == 1)
-    {
-      BSP_LED_Toggle(LED2);
-      /* Wait for 100ms */
-      HAL_Delay(100); 
+        /* Test on blink speed */
+        if(BlinkSpeed == 0)
+        {
+            BSP_LED_Toggle(LED2);
+            /* Wait for 500ms */      
+            HAL_Delay(500);      
+        }      
+        else if(BlinkSpeed == 1)
+        {
+            BSP_LED_Toggle(LED2);
+            /* Wait for 100ms */
+            HAL_Delay(100); 
+        }
+        else if(BlinkSpeed == 2)
+        {
+            BSP_LED_Toggle(LED2);    
+            /* wait for 50ms */
+            HAL_Delay(50);  
+        }
     }
-    else if(BlinkSpeed == 2)
-    {
-      BSP_LED_Toggle(LED2);    
-      /* wait for 50ms */
-      HAL_Delay(50);  
-    }
-  }
 }
 
+
+/**
+  * @brief  Configure SPI to be used with VS1053.
+  * @param  None
+  * @retval None
+  */
+static void SPI_Config(void)
+{
+    /*##-1- Configure the SPI peripheral #######################################*/
+
+    /* Set the SPI parameters */
+    SpiHandle.Instance               = SPIx;
+    SpiHandle.Init.BaudRatePrescaler = SPI_BAUDRATEPRESCALER_64;
+    SpiHandle.Init.Direction         = SPI_DIRECTION_2LINES;
+    SpiHandle.Init.CLKPhase          = SPI_PHASE_1EDGE;
+    SpiHandle.Init.CLKPolarity       = SPI_POLARITY_LOW;
+    SpiHandle.Init.DataSize          = SPI_DATASIZE_8BIT;
+    SpiHandle.Init.FirstBit          = SPI_FIRSTBIT_MSB;
+    SpiHandle.Init.TIMode            = SPI_TIMODE_DISABLE;
+    SpiHandle.Init.CRCCalculation    = SPI_CRCCALCULATION_DISABLE;
+    SpiHandle.Init.CRCPolynomial     = 7;
+    SpiHandle.Init.NSS               = SPI_NSS_SOFT;
+    SpiHandle.Init.Mode              = SPI_MODE_MASTER;
+
+    if(HAL_SPI_Init(&SpiHandle) != HAL_OK)
+    {
+        /* Initialization Error */
+        ERROR("SPI Initialization Failed");
+    }
+
+    /* Enable SPI */
+    __HAL_SPI_ENABLE(&SpiHandle);
+}
 /**
   * @brief  EXTI line detection callbacks.
   * @param  GPIO_Pin: Specifies the pins connected EXTI line
