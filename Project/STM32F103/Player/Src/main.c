@@ -27,7 +27,8 @@ SPI_HandleTypeDef SpiHandle;/* SPI handler declaration                        */
 /* Private function prototypes -----------------------------------------------*/
 void SystemClock_Config(void);
 static void LED2_Blink(void);
-static void SPI_Config(void);
+static void SPI_VS_Config(void);
+static void SPI_SD_Config(void);
 static void SDCard_Config(void);
 
 /* Private functions ---------------------------------------------------------*/
@@ -60,8 +61,8 @@ int main(void)
 
     TRACE("Hello World");
 
-    /* Initialize SPI */
-    SPI_Config();
+    /* Initialize SPI for VS1053 */
+    SPI_VS_Config();
 
     /* Initialize VS1053 Chip */
     VS1053_configure(&vs1053,&SpiHandle,
@@ -71,13 +72,10 @@ int main(void)
                      GPIOA,GPIO_PIN_7,
                      5000);
 
+    /* Read Chip ID of VS1053 */
     chipID = VS1053_sci_read(&vs1053,0x0001);
 
     TRACE2("VS1053 Chip ID: %d",chipID);
-
-    VS1053_sci_write(&vs1053,0x3,0xa000);
-    HAL_Delay(1);
-    while(!HAL_GPIO_ReadPin(vs1053.DREQport,vs1053.DREQpin));
 
 
     /* ToDo: Check the availability of the SD card here. */
@@ -225,12 +223,12 @@ static void LED2_Blink(void)
   * @param  None
   * @retval None
   */
-static void SPI_Config(void)
+static void SPI_VS_Config(void)
 {
     /*##-1- Configure the SPI peripheral #######################################*/
 
     /* Set the SPI parameters */
-    SpiHandle.Instance               = SPIx;
+    SpiHandle.Instance               = SPI_VS;
     SpiHandle.Init.BaudRatePrescaler = SPI_BAUDRATEPRESCALER_64;
     SpiHandle.Init.Direction         = SPI_DIRECTION_2LINES;
     SpiHandle.Init.CLKPhase          = SPI_PHASE_1EDGE;
@@ -252,6 +250,40 @@ static void SPI_Config(void)
     /* Enable SPI */
     __HAL_SPI_ENABLE(&SpiHandle);
 }
+
+/**
+  * @brief  Configure SPI to be used with SD Card.
+  * @param  None
+  * @retval None
+  */
+static void SPI_SD_Config(void)
+{
+    /*##-1- Configure the SPI peripheral #######################################*/
+
+    /* Set the SPI parameters */
+    SpiHandle.Instance               = SPI_SD;
+    SpiHandle.Init.BaudRatePrescaler = SPI_BAUDRATEPRESCALER_64;
+    SpiHandle.Init.Direction         = SPI_DIRECTION_2LINES;
+    SpiHandle.Init.CLKPhase          = SPI_PHASE_1EDGE;
+    SpiHandle.Init.CLKPolarity       = SPI_POLARITY_LOW;
+    SpiHandle.Init.DataSize          = SPI_DATASIZE_8BIT;
+    SpiHandle.Init.FirstBit          = SPI_FIRSTBIT_MSB;
+    SpiHandle.Init.TIMode            = SPI_TIMODE_DISABLE;
+    SpiHandle.Init.CRCCalculation    = SPI_CRCCALCULATION_DISABLE;
+    SpiHandle.Init.CRCPolynomial     = 7;
+    SpiHandle.Init.NSS               = SPI_NSS_SOFT;
+    SpiHandle.Init.Mode              = SPI_MODE_MASTER;
+
+    if(HAL_SPI_Init(&SpiHandle) != HAL_OK)
+    {
+        /* Initialization Error */
+        ERROR("SPI Initialization Failed");
+    }
+
+    /* Enable SPI */
+    __HAL_SPI_ENABLE(&SpiHandle);
+}
+
 /**
   * @brief  EXTI line detection callbacks.
   * @param  GPIO_Pin: Specifies the pins connected EXTI line
