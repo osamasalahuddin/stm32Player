@@ -66,17 +66,26 @@ int main(void)
 
     /* Initialize VS1053 Chip */
     VS1053_configure(&vs1053,&SpiHandle,
-                     GPIOA,GPIO_PIN_1,
-                     GPIOA,GPIO_PIN_6,
-                     GPIOA,GPIO_PIN_4,
-                     GPIOA,GPIO_PIN_7,
-                     5000);
+                     SCI_VS_DREQ_GPIO_PORT,SCI_VS_DREQ_PIN,
+                     SCI_VS_CS_GPIO_PORT  ,SCI_VS_CS_PIN,
+                     SCI_VS_DCS_GPIO_PORT ,SCI_VS_DCS_PIN,
+                     SCI_VS_RST_GPIO_PORT ,SCI_VS_RST_PIN,
+                     VS1053_TIMEOUT);
 
     /* Read Chip ID of VS1053 */
     chipID = VS1053_sci_read(&vs1053,0x0001);
 
     TRACE2("VS1053 Chip ID: %d",chipID);
 
+    /* Initialize SPI for SD Card */
+    SPI_SD_Config();
+    TRACE("SD Card SPI Initialized");
+
+    chipID = 0xFF;
+    /* Read Chip ID of VS1053 */
+    chipID = VS1053_sci_read(&vs1053,0x0001);
+
+    TRACE2("VS1053 Chip ID: %d",chipID);
 
     /* ToDo: Check the availability of the SD card here. */
     if(0)

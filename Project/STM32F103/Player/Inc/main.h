@@ -53,6 +53,19 @@
 #define SPI_VS_MOSI_PIN                  GPIO_PIN_15
 #define SPI_VS_MOSI_GPIO_PORT            GPIOB
 
+/* Definition for SCI_VS Pins */
+#define SCI_VS_DREQ_PIN                  GPIO_PIN_1
+#define SCI_VS_DREQ_GPIO_PORT            GPIOA
+#define SCI_VS_CS_PIN                    GPIO_PIN_6
+#define SCI_VS_CS_GPIO_PORT              GPIOB
+#define SCI_VS_DCS_PIN                   GPIO_PIN_4
+#define SCI_VS_DCS_GPIO_PORT             GPIOA
+#define SCI_VS_RST_PIN                   GPIO_PIN_0
+#define SCI_VS_RST_GPIO_PORT             GPIOA
+
+/* Definition of VS1053 Timeout value 5sec */
+#define VS1053_TIMEOUT                   5000
+
 /* Definition for SPI_VS's NVIC */
 #define SPIx_IRQn                        SPI2_IRQn
 #define SPIx_IRQHandler                  SPI2_IRQHandler
@@ -72,6 +85,9 @@
 #define SPI_SD_MISO_GPIO_PORT            GPIOA
 #define SPI_SD_MOSI_PIN                  GPIO_PIN_7
 #define SPI_SD_MOSI_GPIO_PORT            GPIOA
+
+#define SCI_SD_CS_PIN                    GPIO_PIN_5
+#define SCI_SD_CS_GPIO_PORT              GPIOB
 
 /* Definition for SPI_SD's NVIC */
 #define SPI_SD_IRQn                      SPI1_IRQn

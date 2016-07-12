@@ -12,9 +12,11 @@
 #define SCI_HDAT1               0x09
 #define SCI_VOL                 0x0B
 
-#define SCI_GPIO_CLK_ENABLE()   __HAL_RCC_GPIOA_CLK_ENABLE()
-#define SCI_GPIO_CLK_DISABLE()  __HAL_RCC_GPIOA_CLK_DISABLE()
-
+#define SCI_GPIO_CLK_ENABLE()   __HAL_RCC_GPIOA_CLK_ENABLE();\
+                                __HAL_RCC_GPIOB_CLK_ENABLE()
+                                
+#define SCI_GPIO_CLK_DISABLE()  __HAL_RCC_GPIOA_CLK_DISABLE();\
+                                __HAL_RCC_GPIOB_CLK_DISABLE()
 
 typedef struct
 {

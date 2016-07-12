@@ -50,6 +50,8 @@ void VS1053_configure(VS1053_InitTypeDef* vs1053,SPI_HandleTypeDef* hspi,
     
     /* Put VS1053 in reset state */
     HAL_GPIO_WritePin(vs1053->RSTport,vs1053->RSTpin,GPIO_PIN_RESET);     //RESET Low
+    HAL_GPIO_WritePin(vs1053->CSport, vs1053->CSpin, GPIO_PIN_RESET);     //xCS Low
+    HAL_GPIO_WritePin(vs1053->DCSport,vs1053->DCSpin,GPIO_PIN_RESET);     //xDCS Low
     HAL_Delay(10);
 
     /* Send Dummy Data on SPI bus */
