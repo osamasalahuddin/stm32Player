@@ -24,12 +24,19 @@ char SD_Path[4];            /* SD card logical drive path                     */
 VS1053_InitTypeDef vs1053;  /* VS1053 Handler Object                          */
 SPI_HandleTypeDef SpiHandle;/* SPI handler declaration                        */
 
+/* FileSystem Variables */
+FILINFO MyFileInfo;
+DIR MyDirectory;
+FIL MyFile;
+UINT BytesWritten, BytesRead;
+
 /* Private function prototypes -----------------------------------------------*/
 void SystemClock_Config(void);
 static void LED2_Blink(void);
 static void SPI_VS_Config(void);
 static void SPI_SD_Config(void);
 static void SDCard_Config(void);
+static void Play_Directory(void);
 
 /* Private functions ---------------------------------------------------------*/
 
@@ -78,7 +85,7 @@ int main(void)
     TRACE2("VS1053 Chip ID: %d",chipID);
 
     /* Initialize SPI for SD Card */
-    SPI_SD_Config();
+    //SPI_SD_Config();
     TRACE("SD Card SPI Initialized");
 
     chipID = 0xFF;
@@ -88,7 +95,7 @@ int main(void)
     TRACE2("VS1053 Chip ID: %d",chipID);
 
     /* ToDo: Check the availability of the SD card here. */
-    if(0)
+    if(1)
     {
         /* Configure SD card */
         SDCard_Config();
@@ -180,6 +187,7 @@ static void SDCard_Config(void)
         else
         {
             /* Initialize the Directory Files pointers (heap) */
+            Play_Directory();
         }
     }
 }
@@ -310,6 +318,57 @@ void HAL_GPIO_EXTI_Callback(uint16_t GPIO_Pin)
     }
 }
 
+/**
+  * @brief  Play the music files in the directory.
+  * @param  None
+  * @retval None
+  */
+static void Play_Directory(void)
+{
+    DIR directory;
+    FRESULT res;
+
+    /* Open the directory */
+    res = f_opendir(&directory, "/");
+    if((res != FR_OK))
+    {
+        if(res == FR_NO_FILESYSTEM)
+        {
+            /* Display message: SD card not FAT formated */
+            ERROR("SD CARD NOT FORMATTED");    
+        }
+        else
+        {
+            /* Display message: Fail to open directory */
+            ERROR("SD CARD OPEN FAIL");  
+        }
+    }
+    else
+    {
+        char temp[20];
+        /* No Error Found. Root Directory Successfully loaded */
+        TRACE("SD CARD LOADED SUCCESSFULLY");
+
+        /* Read Directory Enteries in Sequence */
+        for (;;)
+        {
+            res = f_readdir(&directory, &MyFileInfo);
+            if (MyFileInfo.fname[0] == 0)
+                break;
+            if(res != FR_OK) 
+            {
+                ERROR("Directory Not Valid");
+                break;
+            
+            }
+            if(MyFileInfo.fname[0] == '.') 
+                continue;
+
+            TRACE(MyFileInfo.fname);
+            continue;
+        }
+    }
+}
 #ifdef  USE_FULL_ASSERT
 /**
   * @brief  Reports the name of the source file and the source line number
