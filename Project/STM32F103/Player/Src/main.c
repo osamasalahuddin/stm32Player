@@ -21,6 +21,7 @@
 uint8_t BlinkSpeed = 0, str[20];
 FATFS SD_FatFs;             /* File system object for SD card logical drive   */
 char SD_Path[4];            /* SD card logical drive path                     */
+char Music_list[5][20];   /* Upto 255 Songs of 20 word char length          */
 VS1053_InitTypeDef vs1053;  /* VS1053 Handler Object                          */
 SPI_HandleTypeDef SpiHandle;/* SPI handler declaration                        */
 
@@ -37,6 +38,8 @@ static void SPI_VS_Config(void);
 static void SPI_SD_Config(void);
 static void SDCard_Config(void);
 static void Play_Directory(void);
+static const char* Get_Filename_Ext(const char *filename);
+void PlayMusic(void);
 
 /* Private functions ---------------------------------------------------------*/
 
@@ -88,12 +91,6 @@ int main(void)
     //SPI_SD_Config();
     TRACE("SD Card SPI Initialized");
 
-    chipID = 0xFF;
-    /* Read Chip ID of VS1053 */
-    chipID = VS1053_sci_read(&vs1053,0x0001);
-
-    TRACE2("VS1053 Chip ID: %d",chipID);
-
     /* ToDo: Check the availability of the SD card here. */
     if(1)
     {
@@ -105,6 +102,12 @@ int main(void)
         ERROR("Failed to load SD Card");
         LED2_Blink();
     }
+
+    chipID = 0xFF;
+    /* Read Chip ID of VS1053 */
+    chipID = VS1053_sci_read(&vs1053,0x0001);
+
+    TRACE2("VS1053 Chip ID: %d",chipID);
 
     /* Infinite loop */
     while (1)
@@ -327,6 +330,16 @@ static void Play_Directory(void)
 {
     DIR directory;
     FRESULT res;
+    /* This function is assuming non-Unicode cfg. */
+    char *fn;
+
+    /* Buffer to Store Long File Name */
+    static char lfn[_MAX_LFN + 1];
+
+#if _USE_LFN
+    MyFileInfo.lfname = lfn;
+    MyFileInfo.lfsize = sizeof(lfn);
+#endif
 
     /* Open the directory */
     res = f_opendir(&directory, "/");
@@ -352,6 +365,7 @@ static void Play_Directory(void)
         /* Read Directory Enteries in Sequence */
         for (;;)
         {
+            static char music_file_num = 0;
             res = f_readdir(&directory, &MyFileInfo);
             if (MyFileInfo.fname[0] == 0)
                 break;
@@ -364,11 +378,82 @@ static void Play_Directory(void)
             if(MyFileInfo.fname[0] == '.') 
                 continue;
 
-            TRACE(MyFileInfo.fname);
+            /* If Long File Name not present then just use the Short Name */
+#if _USE_LFN
+            fn = *MyFileInfo.lfname ? MyFileInfo.lfname : MyFileInfo.fname;
+#else
+            fn = MyFileInfo.fname;
+#endif            
+            TRACE(fn);
+
+            /* Check if this entry is either a Directory or a File */
+            if (!(MyFileInfo.fattrib & AM_DIR))
+            { 
+                /* It is a File. Extract the file extension */
+                const char* file_ext = Get_Filename_Ext(fn);
+                if ((!strcmp(file_ext,"mp3")) || (!strcmp(file_ext,"MP3")))
+                {
+                    /* Its an MP3 File */
+                    char iter;
+                    /* Save the FileName in the Music List */
+                    for (iter = 0; iter < sizeof(MyFileInfo.fname);  iter++)
+                        Music_list[music_file_num][iter] = MyFileInfo.fname[iter];
+                    music_file_num++;
+                }
+            }
+
+            /* Dont Do anything if its a directory */
             continue;
+        }
+        PlayMusic();
+    }
+}
+
+/**
+  * @brief  Extract the File Extension from Filename.
+  * @param  Filename as char string
+  * @retval None
+  */
+static const char* Get_Filename_Ext(const char *filename)
+{
+    const char *dot = strrchr(filename, '.');
+    if(!dot || dot == filename) return "";
+    return dot + 1;
+}
+
+/**
+  * @brief  Play Music List.
+  * @param  None
+  * @retval None
+  */
+void PlayMusic(void)
+{
+    char playnum = 0;
+    FIL file;
+    char temp[255];
+    
+    /* While there are still files in the Music List */
+    while(*Music_list[playnum])
+    {
+        char* temp2 = Music_list[playnum++];
+        FRESULT fres;
+        fres = f_open(&file, temp2, FA_OPEN_EXISTING | FA_READ);
+        if (FR_OK == fres) 
+        {
+            /* The file is opened correctly */
+            sprintf(temp, "Now Playing: %s",temp2);
+            TRACE(temp);
+            
+            
+        }
+        else
+        {
+            sprintf(temp,"FILE CAN'T BE OPENED. ERROR CODE:%d",fres);
+            ERROR(temp);
         }
     }
 }
+
 #ifdef  USE_FULL_ASSERT
 /**
   * @brief  Reports the name of the source file and the source line number
