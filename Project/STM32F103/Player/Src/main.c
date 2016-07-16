@@ -104,11 +104,16 @@ int main(void)
     }
 
     chipID = 0xFF;
+
+    /* Initialize SPI for VS1053 */
+    SPI_VS_Config();
+
     /* Read Chip ID of VS1053 */
     chipID = VS1053_sci_read(&vs1053,0x0001);
 
     TRACE2("VS1053 Chip ID: %d",chipID);
 
+    BSP_SD_Init();
     /* Infinite loop */
     while (1)
     {;}
@@ -328,7 +333,7 @@ void HAL_GPIO_EXTI_Callback(uint16_t GPIO_Pin)
   */
 static void Play_Directory(void)
 {
-    DIR directory;
+    static DIR directory;
     FRESULT res;
     /* This function is assuming non-Unicode cfg. */
     char *fn;
