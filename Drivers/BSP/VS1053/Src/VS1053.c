@@ -68,7 +68,7 @@ void VS1053_configure(VS1053_InitTypeDef* vs1053,SPI_HandleTypeDef* hspi,
 
     while(!HAL_GPIO_ReadPin(vs1053->DREQport,vs1053->DREQpin));
 
-    TRACE("VS1053 Initialization Complete");
+    TRACE("VS1053 Configuration Complete");
 
     vs1053->initialised=1;
     vs1053->playback=0;
@@ -200,5 +200,15 @@ uint16_t VS1053_sci_read(VS1053_InitTypeDef* vs1053,uint8_t addr)
 //Set Volume
 void VS1053_sci_setattenuation(VS1053_InitTypeDef* vs1053,uint8_t l_chan,uint8_t r_chan)
 {
-VS1053_sci_write_DMA(vs1053,SCI_VOL,(l_chan*256)+r_chan);
+    VS1053_sci_write(vs1053,SCI_VOL,(l_chan*256)+r_chan);
+}
+
+void VS1053_SoftReset(VS1053_InitTypeDef* vs1053)
+{
+    /* Newmode, Reset, No L1-2 */
+    VS1053_sci_write(vs1053, SCI_MODE, 0x0804);
+
+    /* Set clock register, doubler etc */
+    VS1053_sci_write(vs1053, SCI_CLOCKF, 0x0a00);
+
 }

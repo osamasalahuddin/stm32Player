@@ -60,7 +60,7 @@ int main(void)
        - Set NVIC Group Priority to 4
        - Low Level Initialization
      */
-    uint8_t chipID;
+    uint16_t temp;
 
     HAL_Init();
 
@@ -74,7 +74,7 @@ int main(void)
     /* Initialize SPI for VS1053 */
     SPI_VS_Config();
 
-    /* Initialize VS1053 Chip */
+    /* Configure VS1053 Chip */
     VS1053_configure(&vs1053,&SpiHandle,
                      SCI_VS_DREQ_GPIO_PORT,SCI_VS_DREQ_PIN,
                      SCI_VS_CS_GPIO_PORT  ,SCI_VS_CS_PIN,
@@ -83,9 +83,8 @@ int main(void)
                      VS1053_TIMEOUT);
 
     /* Read Chip ID of VS1053 */
-    chipID = VS1053_sci_read(&vs1053,0x0001);
-
-    TRACE2("VS1053 Chip ID: %d",chipID);
+    temp = VS1053_sci_read(&vs1053,SCI_STATUS);
+    TRACE2("VS1053 Chip ID: 0x%04X",temp);
 
     /* Initialize SPI for SD Card */
     //SPI_SD_Config();
@@ -103,17 +102,36 @@ int main(void)
         LED2_Blink();
     }
 
-    chipID = 0xFF;
-
     /* Initialize SPI for VS1053 */
-    SPI_VS_Config();
+    //SPI_VS_Config();
 
-    /* Read Chip ID of VS1053 */
-    chipID = VS1053_sci_read(&vs1053,0x0001);
+    /* Write Clock Register, Doubler etc */
+    VS1053_sci_write(&vs1053,SCI_CLOCKF,0xa000);
 
-    TRACE2("VS1053 Chip ID: %d",chipID);
+    /* Read Clock F register */
+    TRACE2("Clock F: 0x%04X",(VS1053_sci_read(&vs1053,SCI_CLOCKF)));
+
+    /* Perform a Soft Reset of VS1053 */
+    VS1053_SoftReset(&vs1053);
+
+    /* Write WRAM Address */
+    VS1053_sci_write(&vs1053,SCI_WRAMADDR,0xC013);
+
+    temp = (VS1053_sci_read(&vs1053,SCI_WRAMADDR));
+
+    /* Reading the Value Twice Just to be sure that the value is not changed in between */
+    if (VS1053_sci_read(&vs1053,SCI_WRAMADDR) == temp) 
+        TRACE2("WRAMADDR1: 0x%04X",temp);
+
+    /* Adjust the Volume at level 20 for both channels */
+    VS1053_sci_setattenuation(&vs1053,20,20);
+
 
     BSP_SD_Init();
+
+    /* Initialize the Directory Files pointers (heap) */
+    Play_Directory();
+
     /* Infinite loop */
     while (1)
     {;}
@@ -194,8 +212,7 @@ static void SDCard_Config(void)
         }
         else
         {
-            /* Initialize the Directory Files pointers (heap) */
-            Play_Directory();
+            
         }
     }
 }
@@ -342,6 +359,7 @@ static void Play_Directory(void)
     static char lfn[_MAX_LFN + 1];
 
 #if _USE_LFN
+    /* Use Long File Name Strings instead */
     MyFileInfo.lfname = lfn;
     MyFileInfo.lfsize = sizeof(lfn);
 #endif
