@@ -99,12 +99,33 @@ void VS1053_sdi_write(VS1053_InitTypeDef* vs1053,uint8_t* txbuff,uint16_t datasi
 {
     if(vs1053->initialised)
     {
+
+        if(HAL_OK != HAL_SPI_Transmit(vs1053->hspi,txbuff,datasize,vs1053->timeout))//Write Data
+        {
+            ERROR("SPI TX FAILED");
+            return;
+        }
+
         while(!(HAL_GPIO_ReadPin(vs1053->DREQport,vs1053->DREQpin))); //Wait while DREQ is low
-        HAL_GPIO_WritePin(vs1053->CSport,vs1053->CSpin,GPIO_PIN_SET);
-        HAL_GPIO_WritePin(vs1053->DCSport,vs1053->DCSpin,GPIO_PIN_SET);
-        HAL_GPIO_WritePin(vs1053->DCSport,vs1053->DCSpin,GPIO_PIN_RESET);
-        HAL_SPI_Transmit(vs1053->hspi,txbuff,datasize,vs1053->timeout);
-        HAL_GPIO_WritePin(vs1053->DCSport,vs1053->CSpin,GPIO_PIN_SET);
+    }
+}
+
+void VS1053_sdi_write32(VS1053_InitTypeDef* vs1053,uint8_t* txbuff)
+{
+    int count = 0;
+    if(vs1053->initialised)
+    {
+
+        while (count++ < 32)
+        {
+            if(HAL_OK != HAL_SPI_Transmit(vs1053->hspi,txbuff++,1,vs1053->timeout))//Write Data
+            {
+                ERROR("SPI TX FAILED");
+                return;
+            }
+            while(!(HAL_GPIO_ReadPin(vs1053->DREQport,vs1053->DREQpin))); //Wait while DREQ is low
+        }
+
     }
 }
 
@@ -203,6 +224,7 @@ void VS1053_sci_setattenuation(VS1053_InitTypeDef* vs1053,uint8_t l_chan,uint8_t
     VS1053_sci_write(vs1053,SCI_VOL,(l_chan*256)+r_chan);
 }
 
+// Perform Soft Reset
 void VS1053_SoftReset(VS1053_InitTypeDef* vs1053)
 {
     /* Newmode, Reset, No L1-2 */
@@ -212,3 +234,21 @@ void VS1053_SoftReset(VS1053_InitTypeDef* vs1053)
     VS1053_sci_write(vs1053, SCI_CLOCKF, 0x0a00);
 
 }
+
+// Send 2048 Zeros
+void VS1053_SendZeros(VS1053_InitTypeDef* vs1053, uint8_t EndFillByte)
+{
+    uint16_t i;
+    /* Send A zero */
+    VS1053_sdi_write(vs1053,&EndFillByte,1);
+
+    for (i=0; i<2052; i++)
+    { 
+        VS1053_sdi_write(vs1053,&EndFillByte,1);
+    }
+
+    /* Set clock register, doubler etc */
+    VS1053_sci_write(vs1053, SCI_CLOCKF, 0x0a00);
+
+}
+

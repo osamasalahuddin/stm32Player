@@ -22,20 +22,24 @@ Dialog DLL:      TCM.DLL V1.14.8.0
  
 <h2>Project:</h2>
 D:\Idealojy\New folder\stm32Player\Project\STM32F103\Player\MDK-ARM\Project.uvprojx
-Project File Date:  07/15/2016
+Project File Date:  07/17/2016
 
 <h2>Output:</h2>
 *** Using Compiler 'V5.06 update 1 (build 61)', folder: 'C:\Keil_v518\ARM\ARMCC\Bin'
 Build target 'STM32F103RB_Nucleo'
 compiling main.c...
-../Src/main.c(384): warning:  #177-D: variable "temp" was declared but never referenced
-          char temp[20];
-../Src/main.c(301): warning:  #177-D: function "SPI_SD_Config" was declared but never referenced
+../Src/main.c(492): warning:  #167-D: argument of type "char *" is incompatible with parameter of type "uint8_t *"
+              VS1053_sdi_write(vs1053,&temp[0],1);
+../Src/main.c(493): warning:  #167-D: argument of type "char *" is incompatible with parameter of type "uint8_t *"
+              VS1053_sdi_write(vs1053,&temp[0],1);
+../Src/main.c(452): warning:  #550-D: variable "bytes_sent" was set but never used
+      unsigned int bytes_read, bytes_sent;
+../Src/main.c(295): warning:  #177-D: function "SPI_SD_Config" was declared but never referenced
   static void SPI_SD_Config(void)
-../Src/main.c: 2 warnings, 0 errors
+../Src/main.c: 4 warnings, 0 errors
 linking...
-Program Size: Code=24248 RO-data=1708 RW-data=84 ZI-data=5916  
-"STM32F103RB_Nucleo\STM32F103RB_Nucleo.axf" - 0 Error(s), 2 Warning(s).
+Program Size: Code=26376 RO-data=1708 RW-data=84 ZI-data=6428  
+"STM32F103RB_Nucleo\STM32F103RB_Nucleo.axf" - 0 Error(s), 4 Warning(s).
 
 <h2>Software Packages used:</h2>
 

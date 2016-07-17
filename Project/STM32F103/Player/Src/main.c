@@ -14,7 +14,8 @@
 /* Private typedef -----------------------------------------------------------*/
 
 /* Private define ------------------------------------------------------------*/
-
+#define MAX_FILE_BUFF_SIZE      512
+#define BYTES_2_WRITE           32
 /* Private macro -------------------------------------------------------------*/
 
 /* Private variables ---------------------------------------------------------*/
@@ -37,9 +38,9 @@ static void LED2_Blink(void);
 static void SPI_VS_Config(void);
 static void SPI_SD_Config(void);
 static void SDCard_Config(void);
-static void Play_Directory(void);
+static void Play_Directory(VS1053_InitTypeDef* vs1053);
 static const char* Get_Filename_Ext(const char *filename);
-void PlayMusic(void);
+void PlayMusic(VS1053_InitTypeDef* vs1053);
 
 /* Private functions ---------------------------------------------------------*/
 
@@ -86,15 +87,12 @@ int main(void)
     temp = VS1053_sci_read(&vs1053,SCI_STATUS);
     TRACE2("VS1053 Chip ID: 0x%04X",temp);
 
-    /* Initialize SPI for SD Card */
-    //SPI_SD_Config();
-    TRACE("SD Card SPI Initialized");
-
     /* ToDo: Check the availability of the SD card here. */
     if(1)
     {
         /* Configure SD card */
         SDCard_Config();
+        TRACE("SD Card Configured");
     }
     else /* SD Card not mounted */
     {
@@ -102,11 +100,8 @@ int main(void)
         LED2_Blink();
     }
 
-    /* Initialize SPI for VS1053 */
-    //SPI_VS_Config();
-
     /* Write Clock Register, Doubler etc */
-    VS1053_sci_write(&vs1053,SCI_CLOCKF,0xa000);
+    VS1053_sci_write(&vs1053,SCI_CLOCKF,0xA000);
 
     /* Read Clock F register */
     TRACE2("Clock F: 0x%04X",(VS1053_sci_read(&vs1053,SCI_CLOCKF)));
@@ -118,19 +113,18 @@ int main(void)
     VS1053_sci_write(&vs1053,SCI_WRAMADDR,0xC013);
 
     temp = (VS1053_sci_read(&vs1053,SCI_WRAMADDR));
-
-    /* Reading the Value Twice Just to be sure that the value is not changed in between */
+    /* Reading the Value Twice Just to be sure that the value is not changed in
+       between 2 Bytes access */
     if (VS1053_sci_read(&vs1053,SCI_WRAMADDR) == temp) 
         TRACE2("WRAMADDR1: 0x%04X",temp);
 
     /* Adjust the Volume at level 20 for both channels */
     VS1053_sci_setattenuation(&vs1053,20,20);
 
-
     BSP_SD_Init();
 
     /* Initialize the Directory Files pointers (heap) */
-    Play_Directory();
+    Play_Directory(&vs1053);
 
     /* Infinite loop */
     while (1)
@@ -345,10 +339,10 @@ void HAL_GPIO_EXTI_Callback(uint16_t GPIO_Pin)
 
 /**
   * @brief  Play the music files in the directory.
-  * @param  None
+  * @param  VS1053 Pointer to Instance for SPI commands
   * @retval None
   */
-static void Play_Directory(void)
+static void Play_Directory(VS1053_InitTypeDef* vs1053)
 {
     static DIR directory;
     FRESULT res;
@@ -381,7 +375,6 @@ static void Play_Directory(void)
     }
     else
     {
-        char temp[20];
         /* No Error Found. Root Directory Successfully loaded */
         TRACE("SD CARD LOADED SUCCESSFULLY");
 
@@ -428,7 +421,7 @@ static void Play_Directory(void)
             /* Dont Do anything if its a directory */
             continue;
         }
-        PlayMusic();
+        PlayMusic(vs1053);
     }
 }
 
@@ -446,28 +439,126 @@ static const char* Get_Filename_Ext(const char *filename)
 
 /**
   * @brief  Play Music List.
-  * @param  None
+  * @param  VS1053 for SPI commands
   * @retval None
   */
-void PlayMusic(void)
+void PlayMusic(VS1053_InitTypeDef* vs1053)
 {
     char playnum = 0;
     FIL file;
     char temp[255];
+    int progress;
+    static uint8_t file_read_buff[MAX_FILE_BUFF_SIZE];
+    unsigned int bytes_read, bytes_sent;
+    uint8_t EndFillByte;
     
     /* While there are still files in the Music List */
     while(*Music_list[playnum])
     {
         char* temp2 = Music_list[playnum++];
         FRESULT fres;
+        uint8_t* to_send;
+        char i;
+
         fres = f_open(&file, temp2, FA_OPEN_EXISTING | FA_READ);
         if (FR_OK == fres) 
         {
             /* The file is opened correctly */
-            sprintf(temp, "Now Playing: %s",temp2);
-            TRACE(temp);
+            TRACE2("Now Playing: %s",temp2);
+
+            /* Reset Playback */
+            VS1053_sci_write(vs1053,SCI_MODE,SM_LINE1 | SM_SDINEW );
             
-            
+            /* Write Mode Register */
+            VS1053_sci_write(vs1053,SCI_MODE,SM_SDINEW);
+
+            /* Write Bass Register */
+            VS1053_sci_write(vs1053,SCI_BASS,0x7A00);
+
+            /* Re Sync */
+            VS1053_sci_write(vs1053,SCI_WRAMADDR,0x1e29);
+            VS1053_sci_write(vs1053,SCI_WRAM,0x0000);
+
+            /* The file is opened correctly */
+            TRACE2("WRAM Value: %04X",VS1053_sci_read(vs1053,SCI_WRAM));
+
+            /* As explained in datasheet, set twice 0 in REG_DECODETIME to set time back to 0 */
+            VS1053_sci_write(vs1053,SCI_DECODETIME,0x00);
+            VS1053_sci_write(vs1053,SCI_DECODETIME,0x00);
+
+            HAL_GPIO_WritePin(vs1053->DCSport,vs1053->DCSpin,GPIO_PIN_RESET);
+
+            temp[0] = 0x00;
+            VS1053_sdi_write(vs1053,&temp[0],1);
+            VS1053_sdi_write(vs1053,&temp[0],1);
+
+            /* Read MAX_FILE_BUFF_SIZE bytes in file_read_buff */
+            fres = f_read(&file, file_read_buff, MAX_FILE_BUFF_SIZE, &bytes_read);
+            bytes_sent = 0;
+
+            to_send = file_read_buff;
+            progress = 0;
+
+
+            for(i = 0; i < MAX_FILE_BUFF_SIZE/BYTES_2_WRITE; i++)
+            {
+                while(!(HAL_GPIO_ReadPin(vs1053->DREQport,vs1053->DREQpin))); //Wait while DREQ is low*/
+                to_send = file_read_buff;
+                VS1053_sdi_write32(vs1053,(to_send + i * BYTES_2_WRITE));
+            }
+
+            HAL_GPIO_WritePin(vs1053->DCSport,vs1053->DCSpin,GPIO_PIN_SET);
+
+            /* The file is opened correctly */
+            TRACE2("HDAT0 Value: %04X",VS1053_sci_read(vs1053,SCI_HDAT0));
+            TRACE2("HDAT1 Value: %04X",VS1053_sci_read(vs1053,SCI_HDAT1));
+
+            HAL_GPIO_WritePin(vs1053->DCSport,vs1053->DCSpin,GPIO_PIN_RESET);
+
+            printf("Progress:         %d",progress);
+
+            progress++;
+
+            while (!f_eof(&file)) /* End of File Reached or Not */
+            {
+                /* Read MAX_FILE_BUFF_SIZE bytes in file_read_buff */
+                fres = f_read(&file, file_read_buff, MAX_FILE_BUFF_SIZE, &bytes_read);
+                to_send = file_read_buff;
+
+                while(bytes_read--)
+                    VS1053_sdi_write(vs1053,to_send++,1);
+
+                if (progress/100000)
+                    printf("\b\b\b\b\b\b%d",progress++);
+                else if (progress/10000)
+                    printf("\b\b\b\b\b%d",progress++);
+                else if (progress/1000)
+                    printf("\b\b\b\b%d",progress++);
+                else if (progress/100)
+                    printf("\b\b\b%d",progress++);
+                else if (progress/10)
+                    printf("\b\b%d",progress++);
+                else
+                    printf("\b%d",progress++);
+            }
+            printf("\n");
+
+            HAL_GPIO_WritePin(vs1053->DCSport,vs1053->DCSpin,GPIO_PIN_SET);
+
+            TRACE("Finished Playing");
+
+            /* Write WRAM Address */
+            VS1053_sci_write(vs1053,SCI_WRAMADDR,0x1e06);
+
+            EndFillByte = VS1053_sci_read(vs1053,SCI_WRAM);
+
+            TRACE2("EndFillByte 0x%04X:",EndFillByte)
+            //EndFillByte = VS1053_sci_read(vs1053,0x1e06);
+
+            VS1053_SendZeros(vs1053, EndFillByte);
+            VS1053_sci_write(vs1053,SCI_MODE,SM_CANCEL);
+            VS1053_SendZeros(vs1053, EndFillByte);
+
         }
         else
         {
