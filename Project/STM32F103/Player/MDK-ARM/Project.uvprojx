@@ -329,7 +329,7 @@
             <vShortEn>0</vShortEn>
             <vShortWch>0</vShortWch>
             <VariousControls>
-              <MiscControls>--C99 -Ono_fp_formats</MiscControls>
+              <MiscControls>--C99 -Ono_fp_formats --no_unaligned_access</MiscControls>
               <Define>USE_HAL_DRIVER,STM32F103xB,USE_STM32F1xx_NUCLEO,SD_GET_STATUS_WORKAROUND, TRACE_ENABLE, ERROR_ENABLE, WARNING_ENABLE</Define>
               <Undefine></Undefine>
               <IncludePath>../Inc;../../../../Drivers/CMSIS/Device/ST/STM32F1xx/Include;../../../../Drivers/STM32F1xx_HAL_Driver/Inc;../../../../Drivers/BSP/STM32F1xx_Nucleo;../../../../Drivers/BSP/Components;../../../../Drivers/BSP/Components/Common;..\Debug;..\..\..\..\Drivers\CMSIS\Include;..\..\..\..\Drivers\BSP\VS1053\Inc;../../../../Middlewares/Third_Party/FatFs/src;../../../../Middlewares/Third_Party/FatFs/src/drivers;../../../../Drivers/BSP/Adafruit_Shield</IncludePath>
@@ -534,6 +534,11 @@
               <FileName>ff_gen_drv.c</FileName>
               <FileType>1</FileType>
               <FilePath>..\..\..\..\Middlewares\Third_Party\FatFs\src\ff_gen_drv.c</FilePath>
+            </File>
+            <File>
+              <FileName>ccsbcs.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\..\..\..\Middlewares\Third_Party\FatFs\src\option\ccsbcs.c</FilePath>
             </File>
           </Files>
         </Group>

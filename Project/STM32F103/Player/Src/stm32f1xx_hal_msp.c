@@ -126,34 +126,61 @@ void HAL_UART_MspDeInit(UART_HandleTypeDef *huart)
   */
 void HAL_SPI_MspInit(SPI_HandleTypeDef *hspi)
 {
-GPIO_InitTypeDef  GPIO_InitStruct;
+    GPIO_InitTypeDef  GPIO_InitStruct;
 
-  if(hspi->Instance == SPIx)
-  {     
-    /*##-1- Enable peripherals and GPIO Clocks #################################*/
-    /* Enable GPIO TX/RX clock */
-    SPIx_SCK_GPIO_CLK_ENABLE();
-    SPIx_MISO_GPIO_CLK_ENABLE();
-    SPIx_MOSI_GPIO_CLK_ENABLE();
-    /* Enable SPI clock */
-    SPIx_CLK_ENABLE(); 
-    
-    /*##-2- Configure peripheral GPIO ##########################################*/  
-    /* SPI SCK GPIO pin configuration  */
-    GPIO_InitStruct.Pin       = SPIx_SCK_PIN;
-    GPIO_InitStruct.Mode      = GPIO_MODE_AF_PP;
-    GPIO_InitStruct.Pull      = GPIO_PULLDOWN;
-    GPIO_InitStruct.Speed     = GPIO_SPEED_FREQ_LOW;
-    HAL_GPIO_Init(SPIx_SCK_GPIO_PORT, &GPIO_InitStruct);
+    if(hspi->Instance == SPI_VS)
+    {
+        /*##-1- Enable peripherals and GPIO Clocks #################################*/
+        /* Enable GPIO TX/RX clock */
+        SPI_VS_SCK_GPIO_CLK_ENABLE();
+        SPI_VS_MISO_GPIO_CLK_ENABLE();
+        SPI_VS_MOSI_GPIO_CLK_ENABLE();
+        /* Enable SPI clock */
+        SPI_VS_CLK_ENABLE(); 
 
-    /* SPI MISO GPIO pin configuration  */
-    GPIO_InitStruct.Pin = SPIx_MISO_PIN;
-    HAL_GPIO_Init(SPIx_MISO_GPIO_PORT, &GPIO_InitStruct);
+        /*##-2- Configure peripheral GPIO ##########################################*/  
+        /* SPI SCK GPIO pin configuration  */
+        GPIO_InitStruct.Pin       = SPI_VS_SCK_PIN;
+        GPIO_InitStruct.Mode      = GPIO_MODE_AF_PP;
+        GPIO_InitStruct.Pull      = GPIO_PULLDOWN;
+        GPIO_InitStruct.Speed     = GPIO_SPEED_FREQ_LOW;
+        HAL_GPIO_Init(SPI_VS_SCK_GPIO_PORT, &GPIO_InitStruct);
 
-    /* SPI MOSI GPIO pin configuration  */
-    GPIO_InitStruct.Pin = SPIx_MOSI_PIN;
-    HAL_GPIO_Init(SPIx_MOSI_GPIO_PORT, &GPIO_InitStruct);
-  }
+        /* SPI MISO GPIO pin configuration  */
+        GPIO_InitStruct.Pin = SPI_VS_MISO_PIN;
+        HAL_GPIO_Init(SPI_VS_MISO_GPIO_PORT, &GPIO_InitStruct);
+
+        /* SPI MOSI GPIO pin configuration  */
+        GPIO_InitStruct.Pin = SPI_VS_MOSI_PIN;
+        HAL_GPIO_Init(SPI_VS_MOSI_GPIO_PORT, &GPIO_InitStruct);
+    }
+    else if(hspi->Instance == SPI_SD)
+    {
+        /*##-1- Enable peripherals and GPIO Clocks #################################*/
+        /* Enable GPIO TX/RX clock */
+        SPI_SD_SCK_GPIO_CLK_ENABLE();
+        SPI_SD_MISO_GPIO_CLK_ENABLE();
+        SPI_SD_MOSI_GPIO_CLK_ENABLE();
+        /* Enable SPI clock */
+        SPI_SD_CLK_ENABLE(); 
+
+        /*##-2- Configure peripheral GPIO ##########################################*/  
+        /* SPI SCK GPIO pin configuration  */
+        GPIO_InitStruct.Pin       = SPI_SD_SCK_PIN;
+        GPIO_InitStruct.Mode      = GPIO_MODE_AF_PP;
+        GPIO_InitStruct.Pull      = GPIO_PULLDOWN;
+        GPIO_InitStruct.Speed     = GPIO_SPEED_FREQ_LOW;
+        HAL_GPIO_Init(SPI_SD_SCK_GPIO_PORT, &GPIO_InitStruct);
+
+        /* SPI MISO GPIO pin configuration  */
+        GPIO_InitStruct.Pin = SPI_SD_MISO_PIN;
+        HAL_GPIO_Init(SPI_SD_MISO_GPIO_PORT, &GPIO_InitStruct);
+
+        /* SPI MOSI GPIO pin configuration  */
+        GPIO_InitStruct.Pin = SPI_SD_MOSI_PIN;
+        HAL_GPIO_Init(SPI_SD_MOSI_GPIO_PORT, &GPIO_InitStruct);
+    }
+
 }
 
 /**
@@ -166,16 +193,27 @@ GPIO_InitTypeDef  GPIO_InitStruct;
   */
 void HAL_SPI_MspDeInit(SPI_HandleTypeDef *hspi)
 {
-  if(hspi->Instance == SPIx)
-  {   
-    /*##-1- Disable peripherals and GPIO Clocks ################################*/
-    /* Configure SPI SCK as alternate function  */
-    HAL_GPIO_DeInit(SPIx_SCK_GPIO_PORT, SPIx_SCK_PIN);
-    /* Configure SPI MISO as alternate function  */
-    HAL_GPIO_DeInit(SPIx_MISO_GPIO_PORT, SPIx_MISO_PIN);
-    /* Configure SPI MOSI as alternate function  */
-    HAL_GPIO_DeInit(SPIx_MOSI_GPIO_PORT, SPIx_MOSI_PIN);
-  }
+    if(hspi->Instance == SPI_VS)
+    {
+        /*##-1- Disable peripherals and GPIO Clocks ################################*/
+        /* Configure SPI SCK as alternate function  */
+        HAL_GPIO_DeInit(SPI_VS_SCK_GPIO_PORT, SPI_VS_SCK_PIN);
+        /* Configure SPI MISO as alternate function  */
+        HAL_GPIO_DeInit(SPI_VS_MISO_GPIO_PORT, SPI_VS_MISO_PIN);
+        /* Configure SPI MOSI as alternate function  */
+        HAL_GPIO_DeInit(SPI_VS_MOSI_GPIO_PORT, SPI_VS_MOSI_PIN);
+    }
+    if(hspi->Instance == SPI_SD)
+    {
+        /*##-1- Disable peripherals and GPIO Clocks ################################*/
+        /* Configure SPI SCK as alternate function  */
+        HAL_GPIO_DeInit(SPI_SD_SCK_GPIO_PORT, SPI_SD_SCK_PIN);
+        /* Configure SPI MISO as alternate function  */
+        HAL_GPIO_DeInit(SPI_SD_MISO_GPIO_PORT, SPI_SD_MISO_PIN);
+        /* Configure SPI MOSI as alternate function  */
+        HAL_GPIO_DeInit(SPI_SD_MOSI_GPIO_PORT, SPI_SD_MOSI_PIN);
+    }
+
 }
 
 /**

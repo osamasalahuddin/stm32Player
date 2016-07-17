@@ -38,24 +38,59 @@
 #define USARTx_IRQHandler                USART2_IRQHandler
 
 
+/* Definition for SPI_VS clock resources */
+#define SPI_VS                           SPI2
+#define SPI_VS_CLK_ENABLE()              __HAL_RCC_SPI2_CLK_ENABLE()
+#define SPI_VS_SCK_GPIO_CLK_ENABLE()     __HAL_RCC_GPIOB_CLK_ENABLE()
+#define SPI_VS_MISO_GPIO_CLK_ENABLE()    __HAL_RCC_GPIOB_CLK_ENABLE()
+#define SPI_VS_MOSI_GPIO_CLK_ENABLE()    __HAL_RCC_GPIOB_CLK_ENABLE()
 
-/* Definition for SPIx clock resources */
-#define SPIx                             SPI2
-#define SPIx_CLK_ENABLE()                __HAL_RCC_SPI2_CLK_ENABLE()
-#define SPIx_SCK_GPIO_CLK_ENABLE()       __HAL_RCC_GPIOB_CLK_ENABLE()
-#define SPIx_MISO_GPIO_CLK_ENABLE()      __HAL_RCC_GPIOB_CLK_ENABLE()
-#define SPIx_MOSI_GPIO_CLK_ENABLE()      __HAL_RCC_GPIOB_CLK_ENABLE()
+/* Definition for SPI_VS Pins */
+#define SPI_VS_SCK_PIN                   GPIO_PIN_13
+#define SPI_VS_SCK_GPIO_PORT             GPIOB
+#define SPI_VS_MISO_PIN                  GPIO_PIN_14
+#define SPI_VS_MISO_GPIO_PORT            GPIOB
+#define SPI_VS_MOSI_PIN                  GPIO_PIN_15
+#define SPI_VS_MOSI_GPIO_PORT            GPIOB
 
-/* Definition for SPIx Pins */
-#define SPIx_SCK_PIN                     GPIO_PIN_13
-#define SPIx_SCK_GPIO_PORT               GPIOB
-#define SPIx_MISO_PIN                    GPIO_PIN_14
-#define SPIx_MISO_GPIO_PORT              GPIOB
-#define SPIx_MOSI_PIN                    GPIO_PIN_15
-#define SPIx_MOSI_GPIO_PORT              GPIOB
+/* Definition for SCI_VS Pins */
+#define SCI_VS_DREQ_PIN                  GPIO_PIN_1
+#define SCI_VS_DREQ_GPIO_PORT            GPIOA
+#define SCI_VS_CS_PIN                    GPIO_PIN_6
+#define SCI_VS_CS_GPIO_PORT              GPIOB
+#define SCI_VS_DCS_PIN                   GPIO_PIN_4
+#define SCI_VS_DCS_GPIO_PORT             GPIOA
+#define SCI_VS_RST_PIN                   GPIO_PIN_0
+#define SCI_VS_RST_GPIO_PORT             GPIOA
 
-/* Definition for SPIx's NVIC */
+/* Definition of VS1053 Timeout value 5sec */
+#define VS1053_TIMEOUT                   5000
+
+/* Definition for SPI_VS's NVIC */
 #define SPIx_IRQn                        SPI2_IRQn
 #define SPIx_IRQHandler                  SPI2_IRQHandler
+
+
+/* Definition for SPI_SD clock resources */
+#define SPI_SD                           SPI1
+#define SPI_SD_CLK_ENABLE()              __HAL_RCC_SPI1_CLK_ENABLE()
+#define SPI_SD_SCK_GPIO_CLK_ENABLE()     __HAL_RCC_GPIOA_CLK_ENABLE()
+#define SPI_SD_MISO_GPIO_CLK_ENABLE()    __HAL_RCC_GPIOA_CLK_ENABLE()
+#define SPI_SD_MOSI_GPIO_CLK_ENABLE()    __HAL_RCC_GPIOA_CLK_ENABLE()
+
+/* Definition for SPI_SD Pins */
+#define SPI_SD_SCK_PIN                   GPIO_PIN_5
+#define SPI_SD_SCK_GPIO_PORT             GPIOA
+#define SPI_SD_MISO_PIN                  GPIO_PIN_6
+#define SPI_SD_MISO_GPIO_PORT            GPIOA
+#define SPI_SD_MOSI_PIN                  GPIO_PIN_7
+#define SPI_SD_MOSI_GPIO_PORT            GPIOA
+
+#define SCI_SD_CS_PIN                    GPIO_PIN_5
+#define SCI_SD_CS_GPIO_PORT              GPIOB
+
+/* Definition for SPI_SD's NVIC */
+#define SPI_SD_IRQn                      SPI1_IRQn
+#define SPI_SD_IRQHandler                SPI1_IRQHandler
 
 #endif /* __MAIN_H__ */

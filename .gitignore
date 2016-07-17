@@ -43,6 +43,6 @@
 *.su
 *.d
 *.dep
-
 ./Project/STM32F103/Player/MDK-ARM/STM32F103RB_Nucleo/*.*
 *.DELL
+*.htm

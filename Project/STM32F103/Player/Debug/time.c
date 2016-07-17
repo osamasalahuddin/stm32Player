@@ -18,7 +18,7 @@ sys_time    sysTime;
 sys_time    get_sysTime(void)
 {
     sys_time    time;
-    sysTicks    = HAL_GetTick();
+    sysTicks    = HAL_GetTick()/10;
     time.milli  = sysTicks%100;                     // Milli seconds
     time.sec    = (sysTicks/100)%60;                // Seconds
     time.min    = ((sysTicks/100)/60)%60;           // Minutes

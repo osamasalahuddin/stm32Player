@@ -100,6 +100,8 @@ const uint16_t BUTTON_IRQn[BUTTONn] = {USER_BUTTON_EXTI_IRQn};
 #ifdef HAL_SPI_MODULE_ENABLED
 uint32_t SpixTimeout = NUCLEO_SPIx_TIMEOUT_MAX;        /*<! Value of Timeout when SPI communication fails */
 static SPI_HandleTypeDef hnucleo_Spi;
+extern SPI_HandleTypeDef SpiHandle;                     /* SPI handler declaration                        */
+
 #endif /* HAL_SPI_MODULE_ENABLED */
 
 #ifdef HAL_ADC_MODULE_ENABLED
@@ -422,6 +424,8 @@ static void SPIx_MspInit(void)
   */
 static void SPIx_Init(void)
 {
+  hnucleo_Spi = SpiHandle;
+#if 0
   if(HAL_SPI_GetState(&hnucleo_Spi) == HAL_SPI_STATE_RESET)
   {
     /* SPI Config */
@@ -449,6 +453,7 @@ static void SPIx_Init(void)
     SPIx_MspInit();
     HAL_SPI_Init(&hnucleo_Spi);
   }
+#endif
 }
 
 /**

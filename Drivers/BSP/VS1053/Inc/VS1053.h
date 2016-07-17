@@ -12,9 +12,11 @@
 #define SCI_HDAT1               0x09
 #define SCI_VOL                 0x0B
 
-#define SCI_GPIO_CLK_ENABLE()   __HAL_RCC_GPIOA_CLK_ENABLE()
-#define SCI_GPIO_CLK_DISABLE()  __HAL_RCC_GPIOA_CLK_DISABLE()
-
+#define SCI_GPIO_CLK_ENABLE()   __HAL_RCC_GPIOA_CLK_ENABLE();\
+                                __HAL_RCC_GPIOB_CLK_ENABLE()
+                                
+#define SCI_GPIO_CLK_DISABLE()  __HAL_RCC_GPIOA_CLK_DISABLE();\
+                                __HAL_RCC_GPIOB_CLK_DISABLE()
 
 typedef struct
 {
@@ -50,3 +52,4 @@ void VS1053_sci_write_DMA(VS1053_InitTypeDef* vs1053,uint8_t addr,uint16_t data)
 void VS1053_sdi_write_DMA(VS1053_InitTypeDef* vs1053,uint8_t* txbuff,uint16_t datasize);
 void SPI_Set_Baud_Prescaler(SPI_HandleTypeDef *hspi,uint32_t baud);
 void VS1053_sci_setattenuation(VS1053_InitTypeDef* vs1053,uint8_t l_chan,uint8_t r_chan);
+void VS1053_SoftReset(VS1053_InitTypeDef* vs1053);
