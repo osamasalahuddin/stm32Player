@@ -100,13 +100,18 @@ void VS1053_sdi_write(VS1053_InitTypeDef* vs1053,uint8_t* txbuff,uint16_t datasi
     if(vs1053->initialised)
     {
 
+        while(!(HAL_GPIO_ReadPin(vs1053->DREQport,vs1053->DREQpin))); //Wait while DREQ is low
+        HAL_GPIO_WritePin(vs1053->DCSport,vs1053->DCSpin,GPIO_PIN_SET);
+        HAL_GPIO_WritePin(vs1053->CSport,vs1053->CSpin,GPIO_PIN_SET);
+        HAL_GPIO_WritePin(vs1053->DCSport,vs1053->DCSpin,GPIO_PIN_RESET);
+
         if(HAL_OK != HAL_SPI_Transmit(vs1053->hspi,txbuff,datasize,vs1053->timeout))//Write Data
         {
             ERROR("SPI TX FAILED");
             return;
         }
+        HAL_GPIO_WritePin(vs1053->DCSport,vs1053->DCSpin,GPIO_PIN_SET);
 
-        while(!(HAL_GPIO_ReadPin(vs1053->DREQport,vs1053->DREQpin))); //Wait while DREQ is low
     }
 }
 
@@ -115,16 +120,20 @@ void VS1053_sdi_write32(VS1053_InitTypeDef* vs1053,uint8_t* txbuff)
     int count = 0;
     if(vs1053->initialised)
     {
+        HAL_GPIO_WritePin(vs1053->DCSport,vs1053->DCSpin,GPIO_PIN_SET);
+        HAL_GPIO_WritePin(vs1053->CSport,vs1053->CSpin,GPIO_PIN_SET);
+        HAL_GPIO_WritePin(vs1053->DCSport,vs1053->DCSpin,GPIO_PIN_RESET);
 
         while (count++ < 32)
         {
+            while(!(HAL_GPIO_ReadPin(vs1053->DREQport,vs1053->DREQpin))); //Wait while DREQ is low
             if(HAL_OK != HAL_SPI_Transmit(vs1053->hspi,txbuff++,1,vs1053->timeout))//Write Data
             {
                 ERROR("SPI TX FAILED");
                 return;
             }
-            while(!(HAL_GPIO_ReadPin(vs1053->DREQport,vs1053->DREQpin))); //Wait while DREQ is low
         }
+        HAL_GPIO_WritePin(vs1053->DCSport,vs1053->DCSpin,GPIO_PIN_SET);
 
     }
 }
@@ -176,7 +185,7 @@ void VS1053_sci_write(VS1053_InitTypeDef* vs1053,uint8_t addr,uint16_t data)
             return;
         }
         HAL_GPIO_WritePin(vs1053->CSport,vs1053->CSpin,GPIO_PIN_SET);
-        while((HAL_GPIO_ReadPin(vs1053->DREQport,vs1053->DREQpin))); //Wait while DREQ is high
+        //while((HAL_GPIO_ReadPin(vs1053->DREQport,vs1053->DREQpin))); //Wait while DREQ is high
         while(!(HAL_GPIO_ReadPin(vs1053->DREQport,vs1053->DREQpin))); //Wait while DREQ is low
     }
 }
@@ -227,12 +236,12 @@ void VS1053_sci_setattenuation(VS1053_InitTypeDef* vs1053,uint8_t l_chan,uint8_t
 // Perform Soft Reset
 void VS1053_SoftReset(VS1053_InitTypeDef* vs1053)
 {
-    /* Newmode, Reset, No L1-2 */
-    VS1053_sci_write(vs1053, SCI_MODE, 0x0804);
-
     /* Set clock register, doubler etc */
-    VS1053_sci_write(vs1053, SCI_CLOCKF, 0x0a00);
+    VS1053_sci_write(vs1053, SCI_CLOCKF, 0xA000);
 
+    HAL_Delay(100);
+    /* Newmode, Reset, No L1-2 */
+    VS1053_sci_write(vs1053, SCI_MODE, SM_RESET | SM_SDINEW | SM_SDIORD);
 }
 
 // Send 2048 Zeros

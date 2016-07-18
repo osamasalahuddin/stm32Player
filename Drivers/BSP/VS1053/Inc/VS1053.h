@@ -28,6 +28,7 @@
 #define SM_ADPCM                0x1000
 #define SM_ADPCM_HP             0x2000
 #define SM_LINE1                0x4000
+#define SM_CLK_RANGE            0x8000
 
 #define SCI_GPIO_CLK_ENABLE()   __HAL_RCC_GPIOA_CLK_ENABLE();\
                                 __HAL_RCC_GPIOB_CLK_ENABLE()
