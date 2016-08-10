@@ -117,6 +117,9 @@
 #define WriteSci(x, y, z)       VS1053_sci_write(x, y, z)
 #define WriteSdi(x, y, z)       VS1053_sdi_write(x, y, z)
 
+
+#define min(a,b) (((a)<(b))?(a):(b))
+
 typedef struct
 {
     SPI_HandleTypeDef*  hspi;

@@ -14,8 +14,8 @@
 /* Private typedef -----------------------------------------------------------*/
 
 /* Private define ------------------------------------------------------------*/
-#define MAX_FILE_BUFF_SIZE      8192
-#define BYTES_2_WRITE           512
+#define MAX_FILE_BUFF_SIZE      512
+#define BYTES_2_WRITE           32
 /* Private macro -------------------------------------------------------------*/
 
 /* Private variables ---------------------------------------------------------*/
@@ -36,7 +36,6 @@ UINT BytesWritten, BytesRead;
 void SystemClock_Config(void);
 static void LED2_Blink(void);
 static void SPI_VS_Config(void);
-static void SPI_SD_Config(void);
 static void SDCard_Config(void);
 static void Play_Directory(VS1053_InitTypeDef* vs1053);
 static const char* Get_Filename_Ext(const char *filename);
@@ -61,7 +60,6 @@ int main(void)
        - Set NVIC Group Priority to 4
        - Low Level Initialization
      */
-    uint16_t temp;
 
     HAL_Init();
 
@@ -83,35 +81,23 @@ int main(void)
                      SCI_VS_RST_GPIO_PORT ,SCI_VS_RST_PIN,
                      VS1053_TIMEOUT);
 
-    /* Read Status of VS1053 */
-    temp = VS1053_sci_read(&vs1053,SCI_STATUS);
-    TRACE2("VS1053 Chip ID: 0x%04X",temp);
-
-    /* ToDo: Check the availability of the SD card here. */
-    if(1)
-    {
-        /* Configure SD card */
-        SDCard_Config();
-        TRACE("SD Card Configured");
-    }
-    else /* SD Card not mounted */
-    {
-        ERROR("Failed to load SD Card");
-        LED2_Blink();
-    }
+    /* Check the availability of the SD card here. */
+    /* Configure SD card */
+    SDCard_Config();
+    TRACE("SD Card Configured");
 
     /* Perform a Soft Reset of VS1053 */
     VS1053_SoftReset(&vs1053);
 
     /* Read Clock F register */
-    TRACE2("Clock F: 0x%04X",(VS1053_sci_read(&vs1053,SCI_CLOCKF)));
+    //TRACE2("Clock F: 0x%04X",(VS1053_sci_read(&vs1053,SCI_CLOCKF)));
 
     /* Play Sine Test */
-/*    TRACE("Play Sine Test");
-    VS1053_SineTest(&vs1053); */
+    //TRACE("Play Sine Test");
+    //VS1053_SineTest(&vs1053);
 
-    /* Adjust the Volume at level 20 for both channels */
-    VS1053_sci_setattenuation(&vs1053,50,50);
+    /* Adjust the Volume at level 30 for both channels */
+    VS1053_sci_setattenuation(&vs1053,30,30);
 
     /* Initialize the Directory Files pointers (heap) */
     Play_Directory(&vs1053);
@@ -183,20 +169,20 @@ static void SDCard_Config(void)
 {
     if(FATFS_LinkDriver(&SD_Driver, SD_Path) == 0)
     {
-        /* Initialize the SD mounted on adafruit 1.8" TFT shield */
+        /* Initialize the SD mounted */
         if(BSP_SD_Init() != MSD_OK)
         {
-            ERROR("BSP_SD_INIT_FAILED");
+            ERROR("SD CARD INITIALIZATION FAILED");
         }
 
         /* Check the mounted device */
         if(f_mount(&SD_FatFs, (TCHAR const*)"/", 0) != FR_OK)
         {
-            ERROR("FATFS_NOT_MOUNTED");
+            ERROR("FATFS MOUNT FAILED");
         }
         else
         {
-            
+            /* All OK Do Nothing */
         }
     }
 }
@@ -277,38 +263,6 @@ static void SPI_VS_Config(void)
     __HAL_SPI_ENABLE(&SpiHandle);
 }
 
-/**
-  * @brief  Configure SPI to be used with SD Card.
-  * @param  None
-  * @retval None
-  */
-static void SPI_SD_Config(void)
-{
-    /*##-1- Configure the SPI peripheral #######################################*/
-
-    /* Set the SPI parameters */
-    SpiHandle.Instance               = SPI_SD;
-    SpiHandle.Init.BaudRatePrescaler = SPI_BAUDRATEPRESCALER_64;
-    SpiHandle.Init.Direction         = SPI_DIRECTION_2LINES;
-    SpiHandle.Init.CLKPhase          = SPI_PHASE_1EDGE;
-    SpiHandle.Init.CLKPolarity       = SPI_POLARITY_LOW;
-    SpiHandle.Init.DataSize          = SPI_DATASIZE_8BIT;
-    SpiHandle.Init.FirstBit          = SPI_FIRSTBIT_MSB;
-    SpiHandle.Init.TIMode            = SPI_TIMODE_DISABLE;
-    SpiHandle.Init.CRCCalculation    = SPI_CRCCALCULATION_DISABLE;
-    SpiHandle.Init.CRCPolynomial     = 7;
-    SpiHandle.Init.NSS               = SPI_NSS_SOFT;
-    SpiHandle.Init.Mode              = SPI_MODE_MASTER;
-
-    if(HAL_SPI_Init(&SpiHandle) != HAL_OK)
-    {
-        /* Initialization Error */
-        ERROR("SPI Initialization Failed");
-    }
-
-    /* Enable SPI */
-    __HAL_SPI_ENABLE(&SpiHandle);
-}
 
 /**
   * @brief  EXTI line detection callbacks.
@@ -437,35 +391,33 @@ void PlayMusic(VS1053_InitTypeDef* vs1053)
     char playnum = 0;
     FIL file;
     char temp[255];
-    int progress;
+    uint32_t progress;
     static uint8_t file_read_buff[MAX_FILE_BUFF_SIZE];
-    unsigned int bytes_read, bytes_sent;
+    uint32_t bytes_read;
     uint8_t EndFillByte;
     
     /* While there are still files in the Music List */
     while(*Music_list[playnum])
     {
-        char* temp2 = Music_list[playnum++];
+        char* fileName = Music_list[playnum++];
         FRESULT fres;
         uint8_t* to_send;
         char i;
-        uint16_t hdat;
+
         uint16_t count = 0;
         uint16_t sampleRate = 0;
         uint16_t sciMode = 0;
 
-        fres = f_open(&file, temp2, FA_OPEN_EXISTING | FA_READ);
+        fres = f_open(&file, fileName, FA_OPEN_EXISTING | FA_READ);
         if (FR_OK == fres) 
         {
             /* The file is opened correctly */
-            TRACE2("Now Playing: %s",temp2);
+            TRACE2("Now Playing: %s",fileName);
+            //TRACE2("SCI_STATUS: 0x%04X",VS1053_sci_read(vs1053,SCI_STATUS));
 
-            TRACE2("SCI_STATUS: 0x%04X",VS1053_sci_read(vs1053,SCI_STATUS));
-            
+            /* Read Old SCI Mode and Set SM_SDINEW flag */
             sciMode = VS1053_sci_read(vs1053,SCI_MODE);
-            TRACE2("SCI_MODE: 0x%04X",sciMode);
-
-            sciMode |= (SM_SDINEW | SM_CLK_RANGE);
+            sciMode |= (SM_SDINEW);
 
             /* Reset Playback */
             VS1053_sci_write(vs1053, SCI_MODE, sciMode);
@@ -475,11 +427,8 @@ void PlayMusic(VS1053_InitTypeDef* vs1053)
             //VS1053_sci_write(vs1053,SCI_BASS,0x7A00);
 
             /* Re Sync */
-            //VS1053_sci_write(vs1053,SCI_WRAMADDR,0x1e29);
-            //VS1053_sci_write(vs1053,SCI_WRAM,0x0000);
-
-            /* The file is opened correctly */
-            TRACE2("SCI_STATUS: 0x%04X",VS1053_sci_read(vs1053,SCI_STATUS));
+            VS1053_sci_write(vs1053,SCI_WRAMADDR,0x1e29);
+            VS1053_sci_write(vs1053,SCI_WRAM,0x0000);
 
             /* As explained in datasheet, set twice 0 in REG_DECODETIME to set time back to 0 */
             VS1053_sci_write(vs1053,SCI_DECODETIME,0x00);
@@ -488,8 +437,7 @@ void PlayMusic(VS1053_InitTypeDef* vs1053)
 
             /* Read MAX_FILE_BUFF_SIZE bytes in file_read_buff */
             fres = f_read(&file, file_read_buff, MAX_FILE_BUFF_SIZE, &bytes_read);
-            bytes_sent = 0;
-            
+
             count = min(bytes_read,MAX_FILE_BUFF_SIZE);
             to_send = file_read_buff + count;
             progress = 0;
@@ -502,25 +450,14 @@ void PlayMusic(VS1053_InitTypeDef* vs1053)
                 count = 0;
             }
 
-            /* The file is opened correctly */
-            hdat = VS1053_sci_read(vs1053,SCI_HDAT1);
-
-            if (hdat)
-            {
-                TRACE2("HDAT0 Value: %04X",VS1053_sci_read(vs1053,SCI_HDAT0));
-                TRACE2("HDAT1 Value: %04X",hdat);
-            }
-
             /* Write WRAM Address */
             VS1053_sci_write(vs1053,SCI_WRAMADDR,0x1e06);
             EndFillByte = VS1053_sci_read(vs1053,SCI_WRAM);
 
             sampleRate = VS1053_sci_read(vs1053,SCI_AUDATA);
             TRACE2("Sample Rate: %d",sampleRate);
-            TRACE2("Decode Time: %d",VS1053_sci_read(vs1053,SCI_DECODETIME));
 
             printf("Progress:         %d",progress);
-
             progress++;
 
             while (!f_eof(&file)) /* End of File Reached or Not */
@@ -534,6 +471,7 @@ void PlayMusic(VS1053_InitTypeDef* vs1053)
 
                 to_send = file_read_buff;
 
+                /* Send Single Byte of Data to VS1053 for Playback */
                 while(bytes_read--)
                     VS1053_sdi_write(vs1053,to_send++,1);
 
@@ -554,18 +492,16 @@ void PlayMusic(VS1053_InitTypeDef* vs1053)
 
             TRACE("Finished Playing");
 
-            TRACE2("EndFillByte 0x%04X:",EndFillByte)
-            //EndFillByte = VS1053_sci_read(vs1053,0x1e06);
-
+            /* Cancel the Playback so no noise can be heard between the songs */
             VS1053_SendZeros(vs1053, EndFillByte);
             VS1053_sci_write(vs1053,SCI_MODE,SM_CANCEL);
             VS1053_SendZeros(vs1053, EndFillByte);
-
         }
         else
         {
             sprintf(temp,"FILE CAN'T BE OPENED. ERROR CODE:%d",fres);
             ERROR(temp);
+            LED2_Blink();
         }
     }
 }
@@ -583,6 +519,7 @@ void assert_failed(uint8_t* file, uint32_t line)
     /* User can add his own implementation to report the file name and line number,
        ex: printf("Wrong parameters value: file %s on line %d\r\n", file, line) */
     ERROR("Assert Failed");
+    LED2_Blink();
     /* Infinite loop */
     while (1)
     {;}
