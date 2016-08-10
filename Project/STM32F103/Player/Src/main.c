@@ -14,8 +14,8 @@
 /* Private typedef -----------------------------------------------------------*/
 
 /* Private define ------------------------------------------------------------*/
-#define MAX_FILE_BUFF_SIZE      512
-#define BYTES_2_WRITE           32
+#define MAX_FILE_BUFF_SIZE      8192
+#define BYTES_2_WRITE           512
 /* Private macro -------------------------------------------------------------*/
 
 /* Private variables ---------------------------------------------------------*/
@@ -83,7 +83,7 @@ int main(void)
                      SCI_VS_RST_GPIO_PORT ,SCI_VS_RST_PIN,
                      VS1053_TIMEOUT);
 
-    /* Read Chip ID of VS1053 */
+    /* Read Status of VS1053 */
     temp = VS1053_sci_read(&vs1053,SCI_STATUS);
     TRACE2("VS1053 Chip ID: 0x%04X",temp);
 
@@ -106,20 +106,12 @@ int main(void)
     /* Read Clock F register */
     TRACE2("Clock F: 0x%04X",(VS1053_sci_read(&vs1053,SCI_CLOCKF)));
 
-    /* Write WRAM Address */
-    VS1053_sci_write(&vs1053, SCI_WRAMADDR, 0xC01A);
-    VS1053_sci_write(&vs1053, SCI_WRAM,     0x0002);
-
-    temp = (VS1053_sci_read(&vs1053,SCI_WRAM));
-    /* Reading the Value Twice Just to be sure that the value is not changed in
-       between 2 Bytes access */
-    if (VS1053_sci_read(&vs1053,SCI_WRAM) == temp) 
-        TRACE2("WRAM: 0x%04X",temp);
+    /* Play Sine Test */
+/*    TRACE("Play Sine Test");
+    VS1053_SineTest(&vs1053); */
 
     /* Adjust the Volume at level 20 for both channels */
-    VS1053_sci_setattenuation(&vs1053,20,20);
-
-    BSP_SD_Init();
+    VS1053_sci_setattenuation(&vs1053,50,50);
 
     /* Initialize the Directory Files pointers (heap) */
     Play_Directory(&vs1053);
@@ -478,28 +470,22 @@ void PlayMusic(VS1053_InitTypeDef* vs1053)
             /* Reset Playback */
             VS1053_sci_write(vs1053, SCI_MODE, sciMode);
 
-            TRACE2("SCI_MODE: 0x%04X",VS1053_sci_read(vs1053,SCI_MODE));
-            /* Write Bass Register */
-            VS1053_sci_write(vs1053,SCI_BASS,0x7A00);
+            //TRACE2("SCI_MODE: 0x%04X",VS1053_sci_read(vs1053,SCI_MODE));
+            ///* Write Bass Register */
+            //VS1053_sci_write(vs1053,SCI_BASS,0x7A00);
 
             /* Re Sync */
-            VS1053_sci_write(vs1053,SCI_WRAMADDR,0x1e29);
-            VS1053_sci_write(vs1053,SCI_WRAM,0x0000);
+            //VS1053_sci_write(vs1053,SCI_WRAMADDR,0x1e29);
+            //VS1053_sci_write(vs1053,SCI_WRAM,0x0000);
 
             /* The file is opened correctly */
-            /*TRACE2("WRAM Value: %04X",VS1053_sci_read(vs1053,SCI_WRAM));*/
-
             TRACE2("SCI_STATUS: 0x%04X",VS1053_sci_read(vs1053,SCI_STATUS));
 
             /* As explained in datasheet, set twice 0 in REG_DECODETIME to set time back to 0 */
             VS1053_sci_write(vs1053,SCI_DECODETIME,0x00);
+            VS1053_sci_write(vs1053,SCI_DECODETIME,0x00);
             HAL_Delay(10);
 
-/*
-            temp[0] = 0x00;
-            VS1053_sdi_write(vs1053,&temp[0],1);
-            VS1053_sdi_write(vs1053,&temp[0],1);
-*/
             /* Read MAX_FILE_BUFF_SIZE bytes in file_read_buff */
             fres = f_read(&file, file_read_buff, MAX_FILE_BUFF_SIZE, &bytes_read);
             bytes_sent = 0;
@@ -533,12 +519,6 @@ void PlayMusic(VS1053_InitTypeDef* vs1053)
             TRACE2("Sample Rate: %d",sampleRate);
             TRACE2("Decode Time: %d",VS1053_sci_read(vs1053,SCI_DECODETIME));
 
-
-/*
-            HAL_GPIO_WritePin(vs1053->DCSport,vs1053->DCSpin,GPIO_PIN_SET);
-
-            HAL_GPIO_WritePin(vs1053->DCSport,vs1053->DCSpin,GPIO_PIN_RESET);
-*/
             printf("Progress:         %d",progress);
 
             progress++;
