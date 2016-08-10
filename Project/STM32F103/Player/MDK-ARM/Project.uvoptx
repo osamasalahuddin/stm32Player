@@ -196,9 +196,41 @@
         <Bp>
           <Number>0</Number>
           <Type>0</Type>
+          <LineNumber>605</LineNumber>
+          <EnabledFlag>1</EnabledFlag>
+          <Address>134233596</Address>
+          <ByteObject>0</ByteObject>
+          <HtxType>0</HtxType>
+          <ManyObjects>0</ManyObjects>
+          <SizeOfObject>0</SizeOfObject>
+          <BreakByAccess>0</BreakByAccess>
+          <BreakIfRCount>1</BreakIfRCount>
+          <Filename>..\..\..\..\Drivers\BSP\VS1053\Src\VS1053.c</Filename>
+          <ExecCommand></ExecCommand>
+          <Expression>\\STM32F103RB_Nucleo\../../../../Drivers/BSP/VS1053/Src/VS1053.c\605</Expression>
+        </Bp>
+        <Bp>
+          <Number>1</Number>
+          <Type>0</Type>
+          <LineNumber>604</LineNumber>
+          <EnabledFlag>1</EnabledFlag>
+          <Address>134233812</Address>
+          <ByteObject>0</ByteObject>
+          <HtxType>0</HtxType>
+          <ManyObjects>0</ManyObjects>
+          <SizeOfObject>0</SizeOfObject>
+          <BreakByAccess>0</BreakByAccess>
+          <BreakIfRCount>1</BreakIfRCount>
+          <Filename>..\..\..\..\Drivers\BSP\VS1053\Src\VS1053.c</Filename>
+          <ExecCommand></ExecCommand>
+          <Expression>\\STM32F103RB_Nucleo\../../../../Drivers/BSP/VS1053/Src/VS1053.c\604</Expression>
+        </Bp>
+        <Bp>
+          <Number>2</Number>
+          <Type>0</Type>
           <LineNumber>87</LineNumber>
           <EnabledFlag>1</EnabledFlag>
-          <Address>134227254</Address>
+          <Address>134227294</Address>
           <ByteObject>0</ByteObject>
           <HtxType>0</HtxType>
           <ManyObjects>0</ManyObjects>
@@ -210,7 +242,7 @@
           <Expression>\\STM32F103RB_Nucleo\../Src/stm32f1xx_it.c\87</Expression>
         </Bp>
         <Bp>
-          <Number>1</Number>
+          <Number>3</Number>
           <Type>2</Type>
           <LineNumber>0</LineNumber>
           <EnabledFlag>0</EnabledFlag>
@@ -225,43 +257,17 @@
           <ExecCommand></ExecCommand>
           <Expression>0x20000AD0</Expression>
         </Bp>
-        <Bp>
-          <Number>2</Number>
-          <Type>0</Type>
-          <LineNumber>109</LineNumber>
-          <EnabledFlag>1</EnabledFlag>
-          <Address>134239768</Address>
-          <ByteObject>0</ByteObject>
-          <HtxType>0</HtxType>
-          <ManyObjects>0</ManyObjects>
-          <SizeOfObject>0</SizeOfObject>
-          <BreakByAccess>0</BreakByAccess>
-          <BreakIfRCount>1</BreakIfRCount>
-          <Filename>../Src/main.c</Filename>
-          <ExecCommand></ExecCommand>
-          <Expression>\\STM32F103RB_Nucleo\../Src/main.c\109</Expression>
-        </Bp>
       </Breakpoint>
       <WatchWindow1>
         <Ww>
           <count>0</count>
           <WinNumber>1</WinNumber>
-          <ItemText>MyFileInfo</ItemText>
+          <ItemText>disk</ItemText>
         </Ww>
         <Ww>
           <count>1</count>
           <WinNumber>1</WinNumber>
-          <ItemText>Music_list</ItemText>
-        </Ww>
-        <Ww>
-          <count>2</count>
-          <WinNumber>1</WinNumber>
-          <ItemText>disk</ItemText>
-        </Ww>
-        <Ww>
-          <count>3</count>
-          <WinNumber>1</WinNumber>
-          <ItemText>file_ext</ItemText>
+          <ItemText>playBuf</ItemText>
         </Ww>
       </WatchWindow1>
       <MemoryWindow1>
@@ -278,7 +284,7 @@
       <DebugFlag>
         <trace>0</trace>
         <periodic>1</periodic>
-        <aLwin>1</aLwin>
+        <aLwin>0</aLwin>
         <aCover>0</aCover>
         <aSer1>0</aSer1>
         <aSer2>0</aSer2>

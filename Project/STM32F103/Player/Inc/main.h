@@ -93,4 +93,6 @@
 #define SPI_SD_IRQn                      SPI1_IRQn
 #define SPI_SD_IRQHandler                SPI1_IRQHandler
 
+#define min(a,b) (((a)<(b))?(a):(b))
+
 #endif /* __MAIN_H__ */
