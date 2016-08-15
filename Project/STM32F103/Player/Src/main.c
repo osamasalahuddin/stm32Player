@@ -25,6 +25,9 @@ char SD_Path[4];            /* SD card logical drive path                     */
 char Music_list[5][20];     /* Upto 255 Songs of 20 word char length          */
 VS1053_InitTypeDef vs1053;  /* VS1053 Handler Object                          */
 SPI_HandleTypeDef SpiHandle;/* SPI handler declaration                        */
+USBD_HandleTypeDef USBD_Device;
+uint8_t HID_Buffer[4];
+
 
 /* FileSystem Variables */
 FILINFO MyFileInfo;
@@ -67,6 +70,15 @@ int main(void)
     SystemClock_Config();
 
     init_debug();
+
+    /* Init Device Library */
+    USBD_Init(&USBD_Device, &HID_Desc, 0);
+
+    /* Register the HID class */
+    USBD_RegisterClass(&USBD_Device, USBD_HID_CLASS);
+
+    /* Start Device Process */
+    USBD_Start(&USBD_Device);
 
     TRACE("Hello World");
 
@@ -261,24 +273,6 @@ static void SPI_VS_Config(void)
 
     /* Enable SPI */
     __HAL_SPI_ENABLE(&SpiHandle);
-}
-
-
-/**
-  * @brief  EXTI line detection callbacks.
-  * @param  GPIO_Pin: Specifies the pins connected EXTI line
-  * @retval None
-  */
-void HAL_GPIO_EXTI_Callback(uint16_t GPIO_Pin)
-{
-    if(BlinkSpeed == 2)
-    {
-        BlinkSpeed = 0;
-    }
-    else
-    {
-        BlinkSpeed++;
-    }
 }
 
 /**

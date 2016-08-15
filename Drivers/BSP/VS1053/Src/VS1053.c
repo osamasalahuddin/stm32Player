@@ -502,9 +502,6 @@ static uint16_t LinToDB(unsigned short n) {
   return res;
 }
 
-
-
-
 /*
 
   Loads a plugin.

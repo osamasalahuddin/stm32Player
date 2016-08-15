@@ -53,11 +53,17 @@
 
 /* Private typedef -----------------------------------------------------------*/
 /* Private define ------------------------------------------------------------*/
+#define CURSOR_STEP     5
+
 /* Private macro -------------------------------------------------------------*/
 /* Private variables ---------------------------------------------------------*/
 extern uint8_t BlinkSpeed;
 /* UART handler declared in "main.c" file */
 extern UART_HandleTypeDef UartHandle;
+/* USB_Device and HID_Buffer declared in "main.c" file */
+extern USBD_HandleTypeDef USBD_Device;
+extern uint8_t HID_Buffer[4];
+uint32_t tick_cnt = 0;
 
 /* Private function prototypes -----------------------------------------------*/
 /* Private functions ---------------------------------------------------------*/
@@ -156,6 +162,31 @@ void PendSV_Handler(void)
 }
 
 /**
+  * @brief  Gets Pointer Data.
+  * @param  pbuf: Pointer to report
+  * @retval None
+  */
+static void GetPointerData(uint8_t *pbuf)
+{
+  static int8_t cnt = 0;
+  int8_t  x = 0, y = 0 ;
+  
+  if(cnt++ > 0)
+  {
+    x = CURSOR_STEP;
+  }
+  else
+  {
+    x = -CURSOR_STEP;
+  }
+  
+  pbuf[0] = 0;
+  pbuf[1] = x;
+  pbuf[2] = y;
+  pbuf[3] = 0;
+}
+
+/**
   * @brief  This function handles SysTick Handler.
   * @param  None
   * @retval None
@@ -163,6 +194,12 @@ void PendSV_Handler(void)
 void SysTick_Handler(void)
 {
     HAL_IncTick();
+    if (tick_cnt++ == 10000) /* 10*100 100 milliseconds */
+    {
+        tick_cnt = 0;
+        GetPointerData(HID_Buffer);
+        USBD_HID_SendReport(&USBD_Device, HID_Buffer, 4);
+    }
 }
 
 /******************************************************************************/
