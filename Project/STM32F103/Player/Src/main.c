@@ -74,8 +74,11 @@ int main(void)
     /* Init Device Library */
     USBD_Init(&USBD_Device, &HID_Desc, 0);
 
-    /* Register the HID class */
-    USBD_RegisterClass(&USBD_Device, USBD_HID_CLASS);
+    /* Register the MSC class */
+    USBD_RegisterClass(&USBD_Device, USBD_MSC_CLASS);
+
+    /* Add Storage callbacks for MSC Class */
+    USBD_MSC_RegisterStorage(&USBD_Device, &USBD_DISK_fops);
 
     /* Start Device Process */
     USBD_Start(&USBD_Device);

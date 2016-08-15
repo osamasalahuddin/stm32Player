@@ -740,6 +740,11 @@ static uint8_t SD_GoIdleState(void)
   return SD_RESPONSE_NO_ERROR;
 }
 
+uint8_t BSP_SD_IsDetected(void)
+{
+    return 0x01;
+}
+
 /**
   * @}
   */  

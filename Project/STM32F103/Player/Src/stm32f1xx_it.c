@@ -194,12 +194,6 @@ static void GetPointerData(uint8_t *pbuf)
 void SysTick_Handler(void)
 {
     HAL_IncTick();
-    if (tick_cnt++ == 10000) /* 10*100 100 milliseconds */
-    {
-        tick_cnt = 0;
-        GetPointerData(HID_Buffer);
-        USBD_HID_SendReport(&USBD_Device, HID_Buffer, 4);
-    }
 }
 
 /******************************************************************************/
