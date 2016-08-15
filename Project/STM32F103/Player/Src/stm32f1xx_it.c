@@ -61,6 +61,7 @@ extern uint8_t BlinkSpeed;
 /* UART handler declared in "main.c" file */
 extern UART_HandleTypeDef UartHandle;
 /* USB_Device and HID_Buffer declared in "main.c" file */
+extern PCD_HandleTypeDef hpcd;
 extern USBD_HandleTypeDef USBD_Device;
 extern uint8_t HID_Buffer[4];
 uint32_t tick_cnt = 0;
@@ -223,6 +224,26 @@ void USARTx_IRQHandler(void)
 void EXTI15_10_IRQHandler(void)
 {
   HAL_GPIO_EXTI_IRQHandler(USER_BUTTON_PIN);
+}
+
+/**
+  * @brief  This function handles USB Handler.
+  * @param  None
+  * @retval None
+  */
+void USB_LP_CAN1_RX0_IRQHandler(void)
+{
+  HAL_PCD_IRQHandler(&hpcd);
+}
+
+/**
+  * @brief  This function handles USB WakeUp interrupt request.
+  * @param  None
+  * @retval None
+  */
+void USBWakeUp_IRQHandler(void)
+{
+  __HAL_USB_WAKEUP_EXTI_CLEAR_FLAG();
 }
 
 /**
