@@ -1,10 +1,11 @@
 /**
   ******************************************************************************
-  * @file    USB_Device/HID_Standalone/Inc/usbd_desc.h
+  * @file    fatfs_storage.h
   * @author  MCD Application Team
   * @version V1.3.0
   * @date    18-December-2015
-  * @brief   Header for usbd_desc.c module
+  * @brief   This file contains all the functions prototypes for the storage
+  *          firmware driver.
   ******************************************************************************
   * @attention
   *
@@ -46,23 +47,64 @@
   */
 
 /* Define to prevent recursive inclusion -------------------------------------*/
-#ifndef __USBD_DESC_H
-#define __USBD_DESC_H
+#ifndef __FATFS_STORAGE_H
+#define __FATFS_STORAGE_H
+
+#ifdef __cplusplus
+extern "C"
+{
+#endif
 
 /* Includes ------------------------------------------------------------------*/
-#include "usbd_def.h"
-
 /* Exported types ------------------------------------------------------------*/
-/* Exported constants --------------------------------------------------------*/
-#define         DEVICE_ID1          (0x1FFFF7E8)
-#define         DEVICE_ID2          (0x1FFFF7EC)
-#define         DEVICE_ID3          (0x1FFFF7F0)
+  
+/* Header of a bitmap file */
+#pragma pack(1) /* Mandatory to remove any padding */
+typedef struct BmpHeader
+{
+  uint8_t  B;
+  uint8_t  M;
+  uint32_t fsize;
+  uint16_t res1;
+  uint16_t res2;
+  uint32_t offset;
+  uint32_t hsize;
+  uint32_t w;
+  uint32_t h;
+  uint16_t planes;
+  uint16_t bpp;
+  uint32_t ctype;
+  uint32_t dsize;
+  uint32_t hppm;
+  uint32_t vppm;
+  uint32_t colorsused;
+  uint32_t colorreq;
+}BmpHeader;
 
-#define  USB_SIZ_STRING_SERIAL      0x1A
+/* Exported constants --------------------------------------------------------*/
 /* Exported macro ------------------------------------------------------------*/
 /* Exported functions ------------------------------------------------------- */
-extern USBD_DescriptorsTypeDef HID_Desc;
+uint32_t Storage_OpenReadFile(uint8_t Xpoz, uint16_t Ypoz, const char *BmpName);
+uint32_t Storage_CopyFile(const char *BmpName1, const char *BmpName2);
+uint32_t Storage_GetDirectoryBitmapFiles(const char* DirName, char* Files[]);
+uint32_t Storage_CheckBitmapFile(const char *BmpName, uint32_t *FileLen);
+uint8_t  Buffercmp(uint8_t *pBuffer1, uint8_t *pBuffer2, uint16_t BufferLength);
 
-#endif /* __USBD_DESC_H */
+#ifdef __cplusplus
+}
+#endif
+
+#endif /* __FATFS_STORAGE_H */
+/**
+  * @}
+  */
+
+/**
+  * @}
+  */
+
+/**
+  * @}
+  */
 
 /************************ (C) COPYRIGHT STMicroelectronics *****END OF FILE****/

@@ -18,8 +18,7 @@
 #include "usbd_core.h"
 #include "stm32f1xx_hal_pcd.h"
 #include "usbd_desc.h"
-#include "usbd_msc.h"
-#include "usbd_storage.h"
+#include "usbd_hid.h"
 
 /* Exported types ------------------------------------------------------------*/
 /* Exported constants --------------------------------------------------------*/

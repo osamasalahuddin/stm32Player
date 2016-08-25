@@ -1,10 +1,10 @@
 /**
   ******************************************************************************
-  * @file    USB_Device/HID_Standalone/Inc/usbd_desc.h
+  * @file    USB_Device/HID_Standalone/Inc/main.h 
   * @author  MCD Application Team
   * @version V1.3.0
   * @date    18-December-2015
-  * @brief   Header for usbd_desc.c module
+  * @brief   Header for main.c module
   ******************************************************************************
   * @attention
   *
@@ -46,23 +46,26 @@
   */
 
 /* Define to prevent recursive inclusion -------------------------------------*/
-#ifndef __USBD_DESC_H
-#define __USBD_DESC_H
+#ifndef __MAIN_H
+#define __MAIN_H
 
 /* Includes ------------------------------------------------------------------*/
-#include "usbd_def.h"
+#include "Debug.h"
+#include "stm32f1xx_hal.h"
+#include "stm32f1xx_nucleo.h"
+#include "usbd_core.h"
+#include "stm32f1xx_hal_pcd.h"
+#include "usbd_desc.h"
+#include "usbd_msc.h"
+#include "usbd_storage.h"
+#include "VS1053.h"
 
 /* Exported types ------------------------------------------------------------*/
 /* Exported constants --------------------------------------------------------*/
-#define         DEVICE_ID1          (0x1FFFF7E8)
-#define         DEVICE_ID2          (0x1FFFF7EC)
-#define         DEVICE_ID3          (0x1FFFF7F0)
-
-#define  USB_SIZ_STRING_SERIAL      0x1A
 /* Exported macro ------------------------------------------------------------*/
 /* Exported functions ------------------------------------------------------- */
-extern USBD_DescriptorsTypeDef HID_Desc;
+void Toggle_Leds(void);
 
-#endif /* __USBD_DESC_H */
+#endif /* __MAIN_H */
 
 /************************ (C) COPYRIGHT STMicroelectronics *****END OF FILE****/

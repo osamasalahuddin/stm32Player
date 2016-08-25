@@ -16,6 +16,7 @@
 /* Private define ------------------------------------------------------------*/
 #define MAX_FILE_BUFF_SIZE      512
 #define BYTES_2_WRITE           32
+#define CURSOR_STEP             5
 /* Private macro -------------------------------------------------------------*/
 
 /* Private variables ---------------------------------------------------------*/
@@ -44,6 +45,7 @@ static void SDCard_Config(void);
 static void Play_Directory(VS1053_InitTypeDef* vs1053);
 static const char* Get_Filename_Ext(const char *filename);
 void PlayMusic(VS1053_InitTypeDef* vs1053);
+static void GetPointerData(uint8_t *pbuf);
 
 /* Private functions ---------------------------------------------------------*/
 
@@ -68,39 +70,49 @@ int main(void)
     HAL_Init();
 
     /* Configure the system clock = 64 MHz */
-    /*SystemClock_Config();
+    /*SystemClock_Config();*/
 
     /* Only for USB */
     /* Configure the system clock = 72 MHz */
     SystemClock_ConfigUSB();
 
+    /* Initialize LED2 */
+    BSP_LED_Init(LED2);
+  
+    /* Configure Key button for remote wakeup */
+    BSP_PB_Init(BUTTON_USER, BUTTON_MODE_EXTI);
+
     init_debug();
 
     /* Init Device Library */
-    USBD_Init(&USBD_Device, &MSC_Desc, 0);
+    USBD_Init(&USBD_Device, &HID_Desc, 0);
 
-    /* Register the MSC class */
-    USBD_RegisterClass(&USBD_Device, USBD_MSC_CLASS);
-
-    /* Add Storage callbacks for MSC Class */
-    USBD_MSC_RegisterStorage(&USBD_Device, &USBD_DISK_fops);
+    /* Register the HID class */
+    USBD_RegisterClass(&USBD_Device, USBD_HID_CLASS);
 
     /* Start Device Process */
     USBD_Start(&USBD_Device);
 
     TRACE("USB Device Mode");
 
-    while(1);
-
+    while (1)
+    {
+        /* Insert delay 100 ms */
+        HAL_Delay(100);  
+        BSP_LED_Toggle(LED2);
+        HAL_Delay(100);  
+        GetPointerData(HID_Buffer);
+        USBD_HID_SendReport(&USBD_Device, HID_Buffer, 4);
+    }
     /* Initialize SPI for VS1053 */
     SPI_VS_Config();
 
     /* Configure VS1053 Chip */
     VS1053_configure(&vs1053,&SpiHandle,
                      SCI_VS_DREQ_GPIO_PORT,SCI_VS_DREQ_PIN,
-                     SCI_VS_CS_GPIO_PORT  ,SCI_VS_CS_PIN,
-                     SCI_VS_DCS_GPIO_PORT ,SCI_VS_DCS_PIN,
-                     SCI_VS_RST_GPIO_PORT ,SCI_VS_RST_PIN,
+                     SCI_VS_CS_GPIO_PORT  ,SCI_VS_CS_PIN  ,
+                     SCI_VS_DCS_GPIO_PORT ,SCI_VS_DCS_PIN ,
+                     SCI_VS_RST_GPIO_PORT ,SCI_VS_RST_PIN ,
                      VS1053_TIMEOUT);
 
     /* Check the availability of the SD card here. */
@@ -112,7 +124,7 @@ int main(void)
     VS1053_SoftReset(&vs1053);
 
     /* Read Clock F register */
-    //TRACE2("Clock F: 0x%04X",(VS1053_sci_read(&vs1053,SCI_CLOCKF)));
+    //TRACE("Clock F: 0x%04X",(VS1053_sci_read(&vs1053,SCI_CLOCKF)));
 
     /* Play Sine Test */
     //TRACE("Play Sine Test");
@@ -128,6 +140,32 @@ int main(void)
     while (1)
     {;}
 }
+
+/**
+  * @brief  Gets Pointer Data.
+  * @param  pbuf: Pointer to report
+  * @retval None
+  */
+static void GetPointerData(uint8_t *pbuf)
+{
+  static int8_t cnt = 0;
+  int8_t  x = 0, y = 0 ;
+  
+  if(cnt++ > 0)
+  {
+    x = CURSOR_STEP;
+  }
+  else
+  {
+    x = -CURSOR_STEP;
+  }
+  
+  pbuf[0] = 0;
+  pbuf[1] = x;
+  pbuf[2] = y;
+  pbuf[3] = 0;
+}
+
 
 /**
   * @brief  System Clock Configuration
@@ -147,7 +185,6 @@ void SystemClock_Config(void)
 {
     RCC_ClkInitTypeDef clkinitstruct = {0};
     RCC_OscInitTypeDef oscinitstruct = {0};
-    RCC_PeriphCLKInitTypeDef rccperiphclkinit = {0};
 
     /* Configure PLL ------------------------------------------------------*/
     /* PLL configuration: PLLCLK = (HSI / 2) * PLLMUL = (8 / 2) * 16 = 64 MHz */
@@ -169,10 +206,10 @@ void SystemClock_Config(void)
     }
 
     /* USB clock selection */
-    rccperiphclkinit.PeriphClockSelection = RCC_PERIPHCLK_USB;
+/*    rccperiphclkinit.PeriphClockSelection = RCC_PERIPHCLK_USB;
     rccperiphclkinit.UsbClockSelection = RCC_USBCLKSOURCE_PLL_DIV1_5;
     HAL_RCCEx_PeriphCLKConfig(&rccperiphclkinit);
-
+*/
     /* Select PLL as system clock source and configure the HCLK, PCLK1 and PCLK2 
        clocks dividers */
     clkinitstruct.ClockType      = (RCC_CLOCKTYPE_SYSCLK | RCC_CLOCKTYPE_HCLK | RCC_CLOCKTYPE_PCLK1 | RCC_CLOCKTYPE_PCLK2);
@@ -477,8 +514,8 @@ void PlayMusic(VS1053_InitTypeDef* vs1053)
         if (FR_OK == fres) 
         {
             /* The file is opened correctly */
-            TRACE2("Now Playing: %s",fileName);
-            //TRACE2("SCI_STATUS: 0x%04X",VS1053_sci_read(vs1053,SCI_STATUS));
+            TRACE("Now Playing: %s",fileName);
+            //TRACE("SCI_STATUS: 0x%04X",VS1053_sci_read(vs1053,SCI_STATUS));
 
             /* Read Old SCI Mode and Set SM_SDINEW flag */
             sciMode = VS1053_sci_read(vs1053,SCI_MODE);
@@ -487,7 +524,7 @@ void PlayMusic(VS1053_InitTypeDef* vs1053)
             /* Reset Playback */
             VS1053_sci_write(vs1053, SCI_MODE, sciMode);
 
-            //TRACE2("SCI_MODE: 0x%04X",VS1053_sci_read(vs1053,SCI_MODE));
+            //TRACE("SCI_MODE: 0x%04X",VS1053_sci_read(vs1053,SCI_MODE));
             ///* Write Bass Register */
             //VS1053_sci_write(vs1053,SCI_BASS,0x7A00);
 
@@ -520,7 +557,7 @@ void PlayMusic(VS1053_InitTypeDef* vs1053)
             EndFillByte = VS1053_sci_read(vs1053,SCI_WRAM);
 
             sampleRate = VS1053_sci_read(vs1053,SCI_AUDATA);
-            TRACE2("Sample Rate: %d",sampleRate);
+            TRACE("Sample Rate: %d",sampleRate);
 
             printf("Progress:         %d",progress);
             progress++;
