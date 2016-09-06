@@ -31,7 +31,7 @@ extern sys_time sysTime;
         printf(__VA_ARGS__);        \
         printf("\r\n");
 #else
-#define ERROR(x)
+#define ERROR(...)
 #endif
 
 /* Use in code only for Logging of Warnings */
@@ -54,7 +54,7 @@ extern sys_time sysTime;
         printf(__VA_ARGS__);        \
         printf("\r\n");
 #else
-#define WARNING(x)
+#define WARNING(...)
 #endif
 
 /* Use in code only for Log messages */
@@ -77,7 +77,7 @@ extern sys_time sysTime;
         printf(__VA_ARGS__);        \
         printf("\r\n");
 #else
-#define TRACE(x)
+#define TRACE(...)
 #endif
 
 void init_debug(void);

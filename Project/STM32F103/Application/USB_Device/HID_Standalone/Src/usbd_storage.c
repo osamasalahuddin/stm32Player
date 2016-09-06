@@ -104,6 +104,8 @@ USBD_StorageTypeDef USBD_DISK_fops = {
 int8_t STORAGE_Init(uint8_t lun)
 {
   //BSP_SD_Init();
+      USBD_UsrLog("STORAGE INIT");
+
   USBD_States = CONNECTED;
   return 0;
 }
@@ -118,7 +120,8 @@ int8_t STORAGE_Init(uint8_t lun)
 int8_t STORAGE_GetCapacity(uint8_t lun, uint32_t *block_num, uint16_t *block_size)
 {
   SD_CardInfo info;
-  
+    USBD_UsrLog("STORAGE GetCapacity");
+
   int8_t ret = -1;
   
   if(BSP_SD_IsDetected() != SD_NOT_PRESENT)
@@ -141,7 +144,8 @@ int8_t STORAGE_IsReady(uint8_t lun)
 {
   static int8_t prev_status = 0;
   int8_t ret = -1;
-  
+  USBD_UsrLog("STORAGE_IsReady");
+
   if(BSP_SD_IsDetected() != SD_NOT_PRESENT)
   {
     if(prev_status < 0)

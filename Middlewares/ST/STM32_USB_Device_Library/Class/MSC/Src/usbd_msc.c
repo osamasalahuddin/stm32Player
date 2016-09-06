@@ -299,7 +299,8 @@ uint8_t  USBD_MSC_Init (USBD_HandleTypeDef *pdev,
                             uint8_t cfgidx)
 {
   int16_t ret = 0;
-   
+    USBD_UsrLog("MSC Init");
+
   if(pdev->dev_speed == USBD_SPEED_HIGH  ) 
   {
     /* Open EP OUT */
@@ -384,7 +385,8 @@ uint8_t  USBD_MSC_DeInit (USBD_HandleTypeDef *pdev,
 uint8_t  USBD_MSC_Setup (USBD_HandleTypeDef *pdev, USBD_SetupReqTypedef *req)
 {
   USBD_MSC_BOT_HandleTypeDef     *hmsc = (USBD_MSC_BOT_HandleTypeDef*) pdev->pClassData;
-  
+  USBD_UsrLog("MSC Setup");
+    
   switch (req->bmRequest & USB_REQ_TYPE_MASK)
   {
 
@@ -550,6 +552,7 @@ uint8_t  *USBD_MSC_GetHSCfgDesc (uint16_t *length)
 */
 uint8_t  *USBD_MSC_GetFSCfgDesc (uint16_t *length)
 {
+  USBD_UsrLog("GetFSCfgDesc");
   *length = sizeof (USBD_MSC_CfgFSDesc);
   return USBD_MSC_CfgFSDesc;
 }
@@ -585,6 +588,8 @@ uint8_t  *USBD_MSC_GetDeviceQualifierDescriptor (uint16_t *length)
 uint8_t  USBD_MSC_RegisterStorage  (USBD_HandleTypeDef   *pdev, 
                                     USBD_StorageTypeDef *fops)
 {
+      USBD_UsrLog("Register Storage");
+
   if(fops != NULL)
   {
     pdev->pUserData= fops;

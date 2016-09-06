@@ -95,15 +95,15 @@ int main(void)
 
     TRACE("USB Device Mode");
 
-    while (1)
-    {
-        /* Insert delay 100 ms */
-        HAL_Delay(100);  
-        BSP_LED_Toggle(LED2);
-        HAL_Delay(100);  
-        GetPointerData(HID_Buffer);
-        USBD_HID_SendReport(&USBD_Device, HID_Buffer, 4);
-    }
+//    while (1)
+//    {
+//        /* Insert delay 100 ms */
+//        HAL_Delay(100);  
+//        BSP_LED_Toggle(LED2);
+//        HAL_Delay(100);  
+//        GetPointerData(HID_Buffer);
+//        USBD_HID_SendReport(&USBD_Device, HID_Buffer, 4);
+//    }
     /* Initialize SPI for VS1053 */
     SPI_VS_Config();
 

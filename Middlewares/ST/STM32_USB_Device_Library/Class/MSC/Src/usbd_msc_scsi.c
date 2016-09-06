@@ -122,7 +122,8 @@ int8_t SCSI_ProcessCmd(USBD_HandleTypeDef  *pdev,
                            uint8_t lun, 
                            uint8_t *params)
 {
-  
+    USBD_UsrLog("SCSI_ProcessCmd");
+
   switch (params[0])
   {
   case SCSI_TEST_UNIT_READY:

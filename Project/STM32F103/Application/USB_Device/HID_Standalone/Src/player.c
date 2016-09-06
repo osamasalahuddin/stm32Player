@@ -75,14 +75,14 @@ void Play_Directory(VS1053_InitTypeDef* vs1053)
         {
             static char music_file_num = 0;
             res = f_readdir(&directory, &MyFileInfo);
-            if (MyFileInfo.fname[0] == 0)
-                break;
             if(res != FR_OK) 
             {
                 ERROR("Directory Not Valid");
                 break;
             
             }
+            if (MyFileInfo.fname[0] == 0)
+                break;
             if(MyFileInfo.fname[0] == '.') 
                 continue;
 

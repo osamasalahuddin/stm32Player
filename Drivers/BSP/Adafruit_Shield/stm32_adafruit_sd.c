@@ -742,7 +742,7 @@ static uint8_t SD_GoIdleState(void)
 
 uint8_t BSP_SD_IsDetected(void)
 {
-    return 0x01;
+    return SD_PRESENT;
 }
 
 /**
