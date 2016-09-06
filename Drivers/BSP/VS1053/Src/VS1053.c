@@ -169,7 +169,7 @@ void VS1053_configure(VS1053_InitTypeDef* vs1053,SPI_HandleTypeDef* hspi,
     ssVer = ((ReadSci(vs1053, SCI_STATUS) >> 4) & 15);
     if (chipNumber[ssVer]) 
     {
-        TRACE2("Chip is VS%d", chipNumber[ssVer]);
+        TRACE("Chip is VS%d", chipNumber[ssVer]);
         if (chipNumber[ssVer] != 1053) 
         {
             ERROR("Incorrect chip\n");
@@ -178,7 +178,7 @@ void VS1053_configure(VS1053_InitTypeDef* vs1053,SPI_HandleTypeDef* hspi,
     } 
     else 
     {
-        TRACE2("Unknown VS10xx SCI_MODE field SS_VER = %d\n", ssVer);
+        TRACE("Unknown VS10xx SCI_MODE field SS_VER = %d\n", ssVer);
         return;
     }
 }
@@ -501,9 +501,6 @@ static uint16_t LinToDB(unsigned short n) {
 
   return res;
 }
-
-
-
 
 /*
 

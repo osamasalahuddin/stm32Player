@@ -87,26 +87,26 @@ ARM Macro Assembler    Page 2
    47 00000000         ;   <o> Stack Size (in Bytes) <0x0-0xFFFFFFFF:8>
    48 00000000         ; </h>
    49 00000000         
-   50 00000000 00000400 
+   50 00000000 00000860 
                        Stack_Size
-                               EQU              0x400
+                               EQU              0x860
    51 00000000         
    52 00000000                 AREA             STACK, NOINIT, READWRITE, ALIGN
 =3
    53 00000000         Stack_Mem
                                SPACE            Stack_Size
-   54 00000400         __initial_sp
-   55 00000400         
-   56 00000400         
-   57 00000400         ; <h> Heap Configuration
-   58 00000400         ;   <o>  Heap Size (in Bytes) <0x0-0xFFFFFFFF:8>
-   59 00000400         ; </h>
-   60 00000400         
-   61 00000400 00000200 
+   54 00000860         __initial_sp
+   55 00000860         
+   56 00000860         
+   57 00000860         ; <h> Heap Configuration
+   58 00000860         ;   <o>  Heap Size (in Bytes) <0x0-0xFFFFFFFF:8>
+   59 00000860         ; </h>
+   60 00000860         
+   61 00000860 00000200 
                        Heap_Size
                                EQU              0x200
-   62 00000400         
-   63 00000400                 AREA             HEAP, NOINIT, READWRITE, ALIGN=
+   62 00000860         
+   63 00000860                 AREA             HEAP, NOINIT, READWRITE, ALIGN=
 3
    64 00000000         __heap_base
    65 00000000         Heap_Mem
@@ -496,12 +496,12 @@ ARM Macro Assembler    Page 8
               00000000 
 Command Line: --debug --xref --diag_suppress=9931 --cpu=Cortex-M3 --apcs=interw
 ork --depend=stm32f103rb_nucleo\startup_stm32f103xb.d -ostm32f103rb_nucleo\star
-tup_stm32f103xb.o -I"D:\Idealojy\New folder\stm32Player\Project\STM32F103\Playe
-r\MDK-ARM\RTE" -IC:\Keil_v518\ARM\PACK\ARM\CMSIS\4.5.0\CMSIS\Include -IC:\Keil_
-v518\ARM\PACK\Keil\STM32F1xx_DFP\2.0.0\Device\Include --predefine="__MICROLIB S
-ETA 1" --predefine="__UVISION_VERSION SETA 518" --predefine="_RTE_ SETA 1" --pr
-edefine="STM32F10X_MD SETA 1" --list=startup_stm32f103xb.lst startup_stm32f103x
-b.s
+tup_stm32f103xb.o -I"D:\Idealojy\New folder\stm32Player\Project\STM32F103\Appli
+cation\USB_Device\HID_Standalone\MDK-ARM\RTE" -IC:\Keil_v518\ARM\PACK\ARM\CMSIS
+\4.5.0\CMSIS\Include -IC:\Keil_v518\ARM\PACK\Keil\STM32F1xx_DFP\2.0.0\Device\In
+clude --predefine="__MICROLIB SETA 1" --predefine="__UVISION_VERSION SETA 518" 
+--predefine="_RTE_ SETA 1" --predefine="STM32F10X_MD SETA 1" --list=startup_stm
+32f103xb.lst startup_stm32f103xb.s
 
 
 
@@ -524,7 +524,7 @@ Symbol: Stack_Mem
    Uses
       None
 Comment: Stack_Mem unused
-__initial_sp 00000400
+__initial_sp 00000860
 
 Symbol: __initial_sp
    Definitions
@@ -1168,7 +1168,7 @@ Symbol: Heap_Size
    Uses
       At line 65 in file startup_stm32f103xb.s
 Comment: Heap_Size used once
-Stack_Size 00000400
+Stack_Size 00000860
 
 Symbol: Stack_Size
    Definitions

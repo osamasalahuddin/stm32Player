@@ -1,10 +1,11 @@
 /**
   ******************************************************************************
-  * @file    Demonstrations/Adafruit_LCD_1_8_SD_Joystick/Inc/stm32f1xx_it.h 
+  * @file    fatfs_storage.h
   * @author  MCD Application Team
   * @version V1.3.0
   * @date    18-December-2015
-  * @brief   This file contains the headers of the interrupt handlers.
+  * @brief   This file contains all the functions prototypes for the storage
+  *          firmware driver.
   ******************************************************************************
   * @attention
   *
@@ -46,38 +47,64 @@
   */
 
 /* Define to prevent recursive inclusion -------------------------------------*/
-#ifndef __STM32F1xx_IT_H
-#define __STM32F1xx_IT_H
+#ifndef __FATFS_STORAGE_H
+#define __FATFS_STORAGE_H
 
 #ifdef __cplusplus
-extern "C" {
+extern "C"
+{
 #endif
 
 /* Includes ------------------------------------------------------------------*/
 /* Exported types ------------------------------------------------------------*/
+  
+/* Header of a bitmap file */
+#pragma pack(1) /* Mandatory to remove any padding */
+typedef struct BmpHeader
+{
+  uint8_t  B;
+  uint8_t  M;
+  uint32_t fsize;
+  uint16_t res1;
+  uint16_t res2;
+  uint32_t offset;
+  uint32_t hsize;
+  uint32_t w;
+  uint32_t h;
+  uint16_t planes;
+  uint16_t bpp;
+  uint32_t ctype;
+  uint32_t dsize;
+  uint32_t hppm;
+  uint32_t vppm;
+  uint32_t colorsused;
+  uint32_t colorreq;
+}BmpHeader;
+
 /* Exported constants --------------------------------------------------------*/
 /* Exported macro ------------------------------------------------------------*/
 /* Exported functions ------------------------------------------------------- */
-
-void NMI_Handler(void);
-void HardFault_Handler(void);
-void MemManage_Handler(void);
-void BusFault_Handler(void);
-void UsageFault_Handler(void);
-void SVC_Handler(void);
-void DebugMon_Handler(void);
-void PendSV_Handler(void);
-void SysTick_Handler(void);
-void OTG_FS_IRQHandler(void);
-void SDIO_IRQHandler(void);
-void USB_LP_CAN1_RX0_IRQHandler(void);
-void USBWakeUp_IRQHandler(void);
-void EXTI15_10_IRQHandler(void);
+uint32_t Storage_OpenReadFile(uint8_t Xpoz, uint16_t Ypoz, const char *BmpName);
+uint32_t Storage_CopyFile(const char *BmpName1, const char *BmpName2);
+uint32_t Storage_GetDirectoryBitmapFiles(const char* DirName, char* Files[]);
+uint32_t Storage_CheckBitmapFile(const char *BmpName, uint32_t *FileLen);
+uint8_t  Buffercmp(uint8_t *pBuffer1, uint8_t *pBuffer2, uint16_t BufferLength);
 
 #ifdef __cplusplus
 }
 #endif
 
-#endif /* __STM32F1xx_IT_H */
+#endif /* __FATFS_STORAGE_H */
+/**
+  * @}
+  */
+
+/**
+  * @}
+  */
+
+/**
+  * @}
+  */
 
 /************************ (C) COPYRIGHT STMicroelectronics *****END OF FILE****/

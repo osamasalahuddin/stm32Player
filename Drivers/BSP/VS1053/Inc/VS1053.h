@@ -1,3 +1,6 @@
+#ifndef  __VS1053__
+#define  __VS1053__
+
 #include "stm32f1xx_hal_def.h"
 
 /* FatFs includes component */
@@ -162,3 +165,5 @@ void VS1053_SineTest(VS1053_InitTypeDef* vs1053);
 void LoadPlugin(VS1053_InitTypeDef* vs1053, const uint16_t *d, uint16_t len);
 int VSTestHandleFile(VS1053_InitTypeDef* vs1053, const char *fileName, int record);
 int VSTestInitSoftware(VS1053_InitTypeDef* vs1053);
+
+#endif /* __VS1053__ */

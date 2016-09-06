@@ -105,7 +105,8 @@ static void MSC_BOT_Abort(USBD_HandleTypeDef  *pdev);
 void MSC_BOT_Init (USBD_HandleTypeDef  *pdev)
 {
   USBD_MSC_BOT_HandleTypeDef  *hmsc = (USBD_MSC_BOT_HandleTypeDef*)pdev->pClassData;
-    
+  USBD_UsrLog("BOT Init");
+  
   hmsc->bot_state  = USBD_BOT_IDLE;
   hmsc->bot_status = USBD_BOT_STATUS_NORMAL;
   
@@ -133,7 +134,8 @@ void MSC_BOT_Init (USBD_HandleTypeDef  *pdev)
 void MSC_BOT_Reset (USBD_HandleTypeDef  *pdev)
 {
   USBD_MSC_BOT_HandleTypeDef  *hmsc = (USBD_MSC_BOT_HandleTypeDef*)pdev->pClassData;
-    
+    USBD_UsrLog("BOT Reset");
+  
   hmsc->bot_state  = USBD_BOT_IDLE;
   hmsc->bot_status = USBD_BOT_STATUS_RECOVERY;  
   
@@ -167,7 +169,8 @@ void MSC_BOT_DataIn (USBD_HandleTypeDef  *pdev,
                      uint8_t epnum)
 {
   USBD_MSC_BOT_HandleTypeDef  *hmsc = (USBD_MSC_BOT_HandleTypeDef*)pdev->pClassData;  
-  
+    USBD_UsrLog("BOT DataIn");
+
   switch (hmsc->bot_state)
   {
   case USBD_BOT_DATA_IN:
@@ -200,7 +203,8 @@ void MSC_BOT_DataOut (USBD_HandleTypeDef  *pdev,
                       uint8_t epnum)
 {
   USBD_MSC_BOT_HandleTypeDef  *hmsc = (USBD_MSC_BOT_HandleTypeDef*)pdev->pClassData;
-  
+    USBD_UsrLog("BOT DataOut");
+
   switch (hmsc->bot_state)
   {
   case USBD_BOT_IDLE:
@@ -232,10 +236,14 @@ void MSC_BOT_DataOut (USBD_HandleTypeDef  *pdev,
 static void  MSC_BOT_CBW_Decode (USBD_HandleTypeDef  *pdev)
 {
   USBD_MSC_BOT_HandleTypeDef  *hmsc = (USBD_MSC_BOT_HandleTypeDef*)pdev->pClassData;  
-  
+    USBD_UsrLog("BOT CBW Decode");
+
   hmsc->csw.dTag = hmsc->cbw.dTag;
   hmsc->csw.dDataResidue = hmsc->cbw.dDataLength;
   
+  USBD_UsrLog("hmsc->cbw.dSignature = 0x%08X",hmsc->cbw.dSignature);
+  USBD_UsrLog("hmsc->cbw.bLUN  = %d",hmsc->cbw.bLUN);
+  USBD_UsrLog("hmsc->cbw.bCBLength = %d",hmsc->cbw.bCBLength);
   if ((USBD_LL_GetRxDataSize (pdev ,MSC_EPOUT_ADDR) != USBD_BOT_CBW_LENGTH) ||
       (hmsc->cbw.dSignature != USBD_BOT_CBW_SIGNATURE)||
         (hmsc->cbw.bLUN > 1) || 
@@ -247,7 +255,8 @@ static void  MSC_BOT_CBW_Decode (USBD_HandleTypeDef  *pdev)
                    hmsc->cbw.bLUN, 
                    ILLEGAL_REQUEST, 
                    INVALID_CDB);
-    
+      USBD_UsrLog("SCSI_SenseCode Fail");
+
     hmsc->bot_status = USBD_BOT_STATUS_ERROR;   
     MSC_BOT_Abort(pdev);
  
@@ -301,7 +310,8 @@ static void  MSC_BOT_SendData(USBD_HandleTypeDef  *pdev,
                               uint16_t len)
 {
   USBD_MSC_BOT_HandleTypeDef  *hmsc = (USBD_MSC_BOT_HandleTypeDef*)pdev->pClassData; 
-  
+    USBD_UsrLog("BOT SendData");
+
   len = MIN (hmsc->cbw.dDataLength, len);
   hmsc->csw.dDataResidue -= len;
   hmsc->csw.bStatus = USBD_CSW_CMD_PASSED;
@@ -321,7 +331,8 @@ void  MSC_BOT_SendCSW (USBD_HandleTypeDef  *pdev,
                               uint8_t CSW_Status)
 {
   USBD_MSC_BOT_HandleTypeDef  *hmsc = (USBD_MSC_BOT_HandleTypeDef*)pdev->pClassData; 
-  
+    USBD_UsrLog("BOT SendCSW");
+
   hmsc->csw.dSignature = USBD_BOT_CSW_SIGNATURE;
   hmsc->csw.bStatus = CSW_Status;
   hmsc->bot_state = USBD_BOT_IDLE;
@@ -349,7 +360,8 @@ void  MSC_BOT_SendCSW (USBD_HandleTypeDef  *pdev,
 static void  MSC_BOT_Abort (USBD_HandleTypeDef  *pdev)
 {
   USBD_MSC_BOT_HandleTypeDef  *hmsc = (USBD_MSC_BOT_HandleTypeDef*)pdev->pClassData; 
-  
+    USBD_UsrLog("BOT Abort");
+
   if ((hmsc->cbw.bmFlags == 0) && 
       (hmsc->cbw.dDataLength != 0) &&
       (hmsc->bot_status == USBD_BOT_STATUS_NORMAL) )

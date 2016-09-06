@@ -1,10 +1,10 @@
 /**
   ******************************************************************************
-  * @file    Demonstrations/Adafruit_LCD_1_8_SD_Joystick/Inc/stm32f1xx_it.h 
+  * @file    USB_Device/MSC_Standalone/Inc/usbd_storage.h
   * @author  MCD Application Team
   * @version V1.3.0
   * @date    18-December-2015
-  * @brief   This file contains the headers of the interrupt handlers.
+  * @brief   Header for usbd_storage.c module
   ******************************************************************************
   * @attention
   *
@@ -44,40 +44,28 @@
   *
   ******************************************************************************
   */
-
+  
 /* Define to prevent recursive inclusion -------------------------------------*/
-#ifndef __STM32F1xx_IT_H
-#define __STM32F1xx_IT_H
-
-#ifdef __cplusplus
-extern "C" {
-#endif
+#ifndef __USBD_STORAGE_H_
+#define __USBD_STORAGE_H_
 
 /* Includes ------------------------------------------------------------------*/
+#include "usbd_msc.h"
+
 /* Exported types ------------------------------------------------------------*/
+
+typedef enum USBD_States_t{
+    UNINITIALIZED,
+    CONNECTED,
+    DISCONNECTED
+}USBD_States_t;
+
 /* Exported constants --------------------------------------------------------*/
 /* Exported macro ------------------------------------------------------------*/
 /* Exported functions ------------------------------------------------------- */
+extern USBD_StorageTypeDef  USBD_DISK_fops;
+extern USBD_States_t USBD_States;
 
-void NMI_Handler(void);
-void HardFault_Handler(void);
-void MemManage_Handler(void);
-void BusFault_Handler(void);
-void UsageFault_Handler(void);
-void SVC_Handler(void);
-void DebugMon_Handler(void);
-void PendSV_Handler(void);
-void SysTick_Handler(void);
-void OTG_FS_IRQHandler(void);
-void SDIO_IRQHandler(void);
-void USB_LP_CAN1_RX0_IRQHandler(void);
-void USBWakeUp_IRQHandler(void);
-void EXTI15_10_IRQHandler(void);
-
-#ifdef __cplusplus
-}
-#endif
-
-#endif /* __STM32F1xx_IT_H */
-
+#endif /* __USBD_STORAGE_H_ */
+ 
 /************************ (C) COPYRIGHT STMicroelectronics *****END OF FILE****/

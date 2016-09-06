@@ -1,10 +1,12 @@
 /**
   ******************************************************************************
-  * @file    stm32f1xx_hal_conf.h
+  * @file    USB_Device/HID_Standalone/Inc/stm32f1xx_hal_conf.h
   * @author  MCD Application Team
   * @version V1.3.0
   * @date    18-December-2015
-  * @brief   HAL configuration file.
+  * @brief   HAL configuration template file.
+  *          This file should be copied to the application folder and renamed
+  *          to stm32f1xx_hal_conf.h.
   ******************************************************************************
   * @attention
   *
@@ -45,28 +47,101 @@
 
 /* Exported types ------------------------------------------------------------*/
 /* Exported constants --------------------------------------------------------*/
+/* Definition for USARTx clock resources */
+#define USARTx                           USART2
+#define USARTx_CLK_ENABLE()              __HAL_RCC_USART2_CLK_ENABLE();
+#define USARTx_RX_GPIO_CLK_ENABLE()      __HAL_RCC_GPIOA_CLK_ENABLE()
+#define USARTx_TX_GPIO_CLK_ENABLE()      __HAL_RCC_GPIOA_CLK_ENABLE()
+
+#define USARTx_FORCE_RESET()             __HAL_RCC_USART2_FORCE_RESET()
+#define USARTx_RELEASE_RESET()           __HAL_RCC_USART2_RELEASE_RESET()
+
+/* Definition for USARTx Pins */
+#define USARTx_TX_PIN                    GPIO_PIN_2
+#define USARTx_TX_GPIO_PORT              GPIOA
+#define USARTx_RX_PIN                    GPIO_PIN_3
+#define USARTx_RX_GPIO_PORT              GPIOA
+
+/* Definition for USARTx's NVIC */
+#define USARTx_IRQn                      USART2_IRQn
+#define USARTx_IRQHandler                USART2_IRQHandler
+
+
+/* Definition for SPI_VS clock resources */
+#define SPI_VS                           SPI2
+#define SPI_VS_CLK_ENABLE()              __HAL_RCC_SPI2_CLK_ENABLE()
+#define SPI_VS_SCK_GPIO_CLK_ENABLE()     __HAL_RCC_GPIOB_CLK_ENABLE()
+#define SPI_VS_MISO_GPIO_CLK_ENABLE()    __HAL_RCC_GPIOB_CLK_ENABLE()
+#define SPI_VS_MOSI_GPIO_CLK_ENABLE()    __HAL_RCC_GPIOB_CLK_ENABLE()
+
+/* Definition for SPI_VS Pins */
+#define SPI_VS_SCK_PIN                   GPIO_PIN_13
+#define SPI_VS_SCK_GPIO_PORT             GPIOB
+#define SPI_VS_MISO_PIN                  GPIO_PIN_14
+#define SPI_VS_MISO_GPIO_PORT            GPIOB
+#define SPI_VS_MOSI_PIN                  GPIO_PIN_15
+#define SPI_VS_MOSI_GPIO_PORT            GPIOB
+
+/* Definition for SCI_VS Pins */
+#define SCI_VS_DREQ_PIN                  GPIO_PIN_1
+#define SCI_VS_DREQ_GPIO_PORT            GPIOA
+#define SCI_VS_CS_PIN                    GPIO_PIN_6
+#define SCI_VS_CS_GPIO_PORT              GPIOB
+#define SCI_VS_DCS_PIN                   GPIO_PIN_4
+#define SCI_VS_DCS_GPIO_PORT             GPIOA
+#define SCI_VS_RST_PIN                   GPIO_PIN_0
+#define SCI_VS_RST_GPIO_PORT             GPIOA
+
+/* Definition of VS1053 Timeout value 5sec */
+#define VS1053_TIMEOUT                   5000
+
+/* Definition for SPI_VS's NVIC */
+#define SPIx_IRQn                        SPI2_IRQn
+#define SPIx_IRQHandler                  SPI2_IRQHandler
+
+
+/* Definition for SPI_SD clock resources */
+#define SPI_SD                           SPI1
+#define SPI_SD_CLK_ENABLE()              __HAL_RCC_SPI1_CLK_ENABLE()
+#define SPI_SD_SCK_GPIO_CLK_ENABLE()     __HAL_RCC_GPIOA_CLK_ENABLE()
+#define SPI_SD_MISO_GPIO_CLK_ENABLE()    __HAL_RCC_GPIOA_CLK_ENABLE()
+#define SPI_SD_MOSI_GPIO_CLK_ENABLE()    __HAL_RCC_GPIOA_CLK_ENABLE()
+
+/* Definition for SPI_SD Pins */
+#define SPI_SD_SCK_PIN                   GPIO_PIN_5
+#define SPI_SD_SCK_GPIO_PORT             GPIOA
+#define SPI_SD_MISO_PIN                  GPIO_PIN_6
+#define SPI_SD_MISO_GPIO_PORT            GPIOA
+#define SPI_SD_MOSI_PIN                  GPIO_PIN_7
+#define SPI_SD_MOSI_GPIO_PORT            GPIOA
+
+#define SCI_SD_CS_PIN                    GPIO_PIN_5
+#define SCI_SD_CS_GPIO_PORT              GPIOB
+
+/* Definition for SPI_SD's NVIC */
+#define SPI_SD_IRQn                      SPI1_IRQn
+#define SPI_SD_IRQHandler                SPI1_IRQHandler
+
+#define min(a,b) (((a)<(b))?(a):(b))
+
 
 /* ########################## Module Selection ############################## */
 /**
   * @brief This is the list of modules to be used in the HAL driver 
   */
 #define HAL_MODULE_ENABLED
-#define HAL_ADC_MODULE_ENABLED
+/* #define HAL_ADC_MODULE_ENABLED */
 /* #define HAL_CAN_MODULE_ENABLED */
-/* #define HAL_CEC_MODULE_ENABLED */
-#define HAL_CORTEX_MODULE_ENABLED
+#define HAL_CORTEX_MODULE_ENABLED */
 /* #define HAL_CRC_MODULE_ENABLED */
 /* #define HAL_DAC_MODULE_ENABLED */
 #define HAL_DMA_MODULE_ENABLED
-/* #define HAL_ETH_MODULE_ENABLED */
 #define HAL_FLASH_MODULE_ENABLED
 #define HAL_GPIO_MODULE_ENABLED
-/* #define HAL_HCD_MODULE_ENABLED */
 /* #define HAL_I2C_MODULE_ENABLED */
 /* #define HAL_I2S_MODULE_ENABLED */
 /* #define HAL_IRDA_MODULE_ENABLED */
 /* #define HAL_IWDG_MODULE_ENABLED */
-/* #define HAL_NAND_MODULE_ENABLED */
 /* #define HAL_NOR_MODULE_ENABLED */
 /* #define HAL_PCCARD_MODULE_ENABLED */
 #define HAL_PCD_MODULE_ENABLED
@@ -74,6 +149,7 @@
 #define HAL_RCC_MODULE_ENABLED
 /* #define HAL_RTC_MODULE_ENABLED */
 /* #define HAL_SD_MODULE_ENABLED */
+/* #define HAL_SDRAM_MODULE_ENABLED */
 /* #define HAL_SMARTCARD_MODULE_ENABLED */
 #define HAL_SPI_MODULE_ENABLED
 /* #define HAL_SRAM_MODULE_ENABLED */
@@ -130,8 +206,8 @@
 /**
   * @brief This is the HAL system configuration section
   */     
-#define  VDD_VALUE                    ((uint32_t)3300) /*!< Value of VDD in mv */           
-#define  TICK_INT_PRIORITY            ((uint32_t)0x000F)    /*!< tick interrupt priority */            
+#define  VDD_VALUE                   ((uint32_t)3300) /*!< Value of VDD in mv */           
+#define  TICK_INT_PRIORITY           ((uint32_t)0x00)    /*!< tick interrupt priority */            
 #define  USE_RTOS                     0     
 #define  PREFETCH_ENABLE              1
 
@@ -140,76 +216,7 @@
   * @brief Uncomment the line below to expanse the "assert_param" macro in the 
   *        HAL drivers code
   */
-/*#define USE_FULL_ASSERT    1*/ 
-
-
-/* ################## Ethernet peripheral configuration ##################### */
-
-/* Section 1 : Ethernet peripheral configuration */
-
-/* MAC ADDRESS: MAC_ADDR0:MAC_ADDR1:MAC_ADDR2:MAC_ADDR3:MAC_ADDR4:MAC_ADDR5 */
-#define MAC_ADDR0   2
-#define MAC_ADDR1   0
-#define MAC_ADDR2   0
-#define MAC_ADDR3   0
-#define MAC_ADDR4   0
-#define MAC_ADDR5   0
-
-/* Definition of the Ethernet driver buffers size and count */   
-#define ETH_RX_BUF_SIZE                ETH_MAX_PACKET_SIZE /* buffer size for receive               */
-#define ETH_TX_BUF_SIZE                ETH_MAX_PACKET_SIZE /* buffer size for transmit              */
-#define ETH_RXBUFNB                    ((uint32_t)8)       /* 4 Rx buffers of size ETH_RX_BUF_SIZE  */
-#define ETH_TXBUFNB                    ((uint32_t)4)       /* 4 Tx buffers of size ETH_TX_BUF_SIZE  */
-
-/* Section 2: PHY configuration section */
-
-/* DP83848 PHY Address*/ 
-#define DP83848_PHY_ADDRESS             0x01
-/* PHY Reset delay these values are based on a 1 ms Systick interrupt*/ 
-#define PHY_RESET_DELAY                 ((uint32_t)0x000000FF)
-/* PHY Configuration delay */
-#define PHY_CONFIG_DELAY                ((uint32_t)0x00000FFF)
-
-#define PHY_READ_TO                     ((uint32_t)0x0000FFFF)
-#define PHY_WRITE_TO                    ((uint32_t)0x0000FFFF)
-
-/* Section 3: Common PHY Registers */
-
-#define PHY_BCR                         ((uint16_t)0x00)    /*!< Transceiver Basic Control Register   */
-#define PHY_BSR                         ((uint16_t)0x01)    /*!< Transceiver Basic Status Register    */
- 
-#define PHY_RESET                       ((uint16_t)0x8000)  /*!< PHY Reset */
-#define PHY_LOOPBACK                    ((uint16_t)0x4000)  /*!< Select loop-back mode */
-#define PHY_FULLDUPLEX_100M             ((uint16_t)0x2100)  /*!< Set the full-duplex mode at 100 Mb/s */
-#define PHY_HALFDUPLEX_100M             ((uint16_t)0x2000)  /*!< Set the half-duplex mode at 100 Mb/s */
-#define PHY_FULLDUPLEX_10M              ((uint16_t)0x0100)  /*!< Set the full-duplex mode at 10 Mb/s  */
-#define PHY_HALFDUPLEX_10M              ((uint16_t)0x0000)  /*!< Set the half-duplex mode at 10 Mb/s  */
-#define PHY_AUTONEGOTIATION             ((uint16_t)0x1000)  /*!< Enable auto-negotiation function     */
-#define PHY_RESTART_AUTONEGOTIATION     ((uint16_t)0x0200)  /*!< Restart auto-negotiation function    */
-#define PHY_POWERDOWN                   ((uint16_t)0x0800)  /*!< Select the power down mode           */
-#define PHY_ISOLATE                     ((uint16_t)0x0400)  /*!< Isolate PHY from MII                 */
-
-#define PHY_AUTONEGO_COMPLETE           ((uint16_t)0x0020)  /*!< Auto-Negotiation process completed   */
-#define PHY_LINKED_STATUS               ((uint16_t)0x0004)  /*!< Valid link established               */
-#define PHY_JABBER_DETECTION            ((uint16_t)0x0002)  /*!< Jabber condition detected            */
-  
-/* Section 4: Extended PHY Registers */
-
-#define PHY_SR                          ((uint16_t)0x10)    /*!< PHY status register Offset                      */
-#define PHY_MICR                        ((uint16_t)0x11)    /*!< MII Interrupt Control Register                  */
-#define PHY_MISR                        ((uint16_t)0x12)    /*!< MII Interrupt Status and Misc. Control Register */
- 
-#define PHY_LINK_STATUS                 ((uint16_t)0x0001)  /*!< PHY Link mask                                   */
-#define PHY_SPEED_STATUS                ((uint16_t)0x0002)  /*!< PHY Speed mask                                  */
-#define PHY_DUPLEX_STATUS               ((uint16_t)0x0004)  /*!< PHY Duplex mask                                 */
-
-#define PHY_MICR_INT_EN                 ((uint16_t)0x0002)  /*!< PHY Enable interrupts                           */
-#define PHY_MICR_INT_OE                 ((uint16_t)0x0001)  /*!< PHY Enable output interrupt events              */
-
-#define PHY_MISR_LINK_INT_EN            ((uint16_t)0x0020)  /*!< Enable Interrupt on change of link status       */
-#define PHY_LINK_INTERRUPT              ((uint16_t)0x2000)  /*!< PHY link status interrupt mask                  */
-
-
+/* #define USE_FULL_ASSERT    1 */
 
 /* Includes ------------------------------------------------------------------*/
 /**
@@ -228,17 +235,9 @@
   #include "stm32f1xx_hal_dma.h"
 #endif /* HAL_DMA_MODULE_ENABLED */
    
-#ifdef HAL_ETH_MODULE_ENABLED
-  #include "stm32f1xx_hal_eth.h"
-#endif /* HAL_ETH_MODULE_ENABLED */  
-   
 #ifdef HAL_CAN_MODULE_ENABLED
  #include "stm32f1xx_hal_can.h"
 #endif /* HAL_CAN_MODULE_ENABLED */
-
-#ifdef HAL_CEC_MODULE_ENABLED
- #include "stm32f1xx_hal_cec.h"
-#endif /* HAL_CEC_MODULE_ENABLED */
 
 #ifdef HAL_CORTEX_MODULE_ENABLED
  #include "stm32f1xx_hal_cortex.h"
@@ -261,11 +260,11 @@
 #endif /* HAL_FLASH_MODULE_ENABLED */
 
 #ifdef HAL_SRAM_MODULE_ENABLED
- #include "stm32f1xx_hal_sram.h"
+  #include "stm32f1xx_hal_sram.h"
 #endif /* HAL_SRAM_MODULE_ENABLED */
 
 #ifdef HAL_NOR_MODULE_ENABLED
- #include "stm32f1xx_hal_nor.h"
+  #include "stm32f1xx_hal_nor.h"
 #endif /* HAL_NOR_MODULE_ENABLED */
 
 #ifdef HAL_I2C_MODULE_ENABLED
@@ -296,9 +295,9 @@
  #include "stm32f1xx_hal_sd.h"
 #endif /* HAL_SD_MODULE_ENABLED */  
 
-#ifdef HAL_NAND_MODULE_ENABLED
- #include "stm32f1xx_hal_nand.h"
-#endif /* HAL_NAND_MODULE_ENABLED */     
+#ifdef HAL_SDRAM_MODULE_ENABLED
+ #include "stm32f1xx_hal_sdram.h"
+#endif /* HAL_SDRAM_MODULE_ENABLED */     
 
 #ifdef HAL_SPI_MODULE_ENABLED
  #include "stm32f1xx_hal_spi.h"
@@ -332,12 +331,6 @@
  #include "stm32f1xx_hal_pcd.h"
 #endif /* HAL_PCD_MODULE_ENABLED */
 
-
-#ifdef HAL_HCD_MODULE_ENABLED
- #include "stm32f1xx_hal_hcd.h"
-#endif /* HAL_HCD_MODULE_ENABLED */   
-   
-
 /* Exported macro ------------------------------------------------------------*/
 #ifdef  USE_FULL_ASSERT
 /**
@@ -353,8 +346,8 @@
   void assert_failed(uint8_t* file, uint32_t line);
 #else
   #define assert_param(expr) ((void)0)
-#endif /* USE_FULL_ASSERT */
-
+#endif /* USE_FULL_ASSERT */    
+    
 #ifdef __cplusplus
 }
 #endif

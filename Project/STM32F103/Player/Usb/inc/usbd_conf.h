@@ -1,10 +1,10 @@
 /**
   ******************************************************************************
-  * @file    Demonstrations/Adafruit_LCD_1_8_SD_Joystick/Inc/stm32f1xx_it.h 
+  * @file    USB_Device/HID_Standalone/Inc/usbd_conf.h
   * @author  MCD Application Team
   * @version V1.3.0
   * @date    18-December-2015
-  * @brief   This file contains the headers of the interrupt handlers.
+  * @brief   General low level driver configuration
   ******************************************************************************
   * @attention
   *
@@ -46,38 +46,72 @@
   */
 
 /* Define to prevent recursive inclusion -------------------------------------*/
-#ifndef __STM32F1xx_IT_H
-#define __STM32F1xx_IT_H
-
-#ifdef __cplusplus
-extern "C" {
-#endif
+#ifndef __USBD_CONF_H
+#define __USBD_CONF_H
 
 /* Includes ------------------------------------------------------------------*/
+#include "stm32f1xx_hal.h"
+#include <stdio.h>
+#include <stdlib.h>
+#include <string.h>
+
 /* Exported types ------------------------------------------------------------*/
 /* Exported constants --------------------------------------------------------*/
+/* Common Config */
+#define USBD_MAX_NUM_INTERFACES               1
+#define USBD_MAX_NUM_CONFIGURATION            1
+#define USBD_MAX_STR_DESC_SIZ                 0x100
+#define USBD_SUPPORT_USER_STRING              0
+#define USBD_SELF_POWERED                     1
+#define USBD_DEBUG_LEVEL                      0
+
+/* MSC Class Config */
+#define MSC_MEDIA_PACKET                      512
+
 /* Exported macro ------------------------------------------------------------*/
-/* Exported functions ------------------------------------------------------- */
+/* Memory management macros */
 
-void NMI_Handler(void);
-void HardFault_Handler(void);
-void MemManage_Handler(void);
-void BusFault_Handler(void);
-void UsageFault_Handler(void);
-void SVC_Handler(void);
-void DebugMon_Handler(void);
-void PendSV_Handler(void);
-void SysTick_Handler(void);
-void OTG_FS_IRQHandler(void);
-void SDIO_IRQHandler(void);
-void USB_LP_CAN1_RX0_IRQHandler(void);
-void USBWakeUp_IRQHandler(void);
-void EXTI15_10_IRQHandler(void);
+/* For footprint reasons and since only one allocation is handled in the HID class
+   driver, the malloc/free is changed into a static allocation method */
 
-#ifdef __cplusplus
-}
+void *USBD_static_malloc(uint32_t size);
+void USBD_static_free(void *p);
+
+#define MAX_STATIC_ALLOC_SIZE     4 /* HID Class Driver Structure size */
+
+#define USBD_malloc               (uint32_t *)USBD_static_malloc
+#define USBD_free                 USBD_static_free
+#define USBD_memset               /* Not used */
+#define USBD_memcpy               /* Not used */
+
+
+/* DEBUG macros */
+#if (USBD_DEBUG_LEVEL > 0)
+#define  USBD_UsrLog(...)   printf(__VA_ARGS__);\
+                            printf("\n");
+#else
+#define USBD_UsrLog(...)
 #endif
 
-#endif /* __STM32F1xx_IT_H */
+#if (USBD_DEBUG_LEVEL > 1)
+
+#define  USBD_ErrLog(...)   printf("ERROR: ") ;\
+                            printf(__VA_ARGS__);\
+                            printf("\n");
+#else
+#define USBD_ErrLog(...)
+#endif
+
+#if (USBD_DEBUG_LEVEL > 2)
+#define  USBD_DbgLog(...)   printf("DEBUG : ") ;\
+                            printf(__VA_ARGS__);\
+                            printf("\n");
+#else
+#define USBD_DbgLog(...)
+#endif
+
+/* Exported functions ------------------------------------------------------- */
+
+#endif /* __USBD_CONF_H */
 
 /************************ (C) COPYRIGHT STMicroelectronics *****END OF FILE****/

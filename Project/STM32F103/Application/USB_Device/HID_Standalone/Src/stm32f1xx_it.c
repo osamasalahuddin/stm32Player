@@ -1,6 +1,6 @@
 /**
   ******************************************************************************
-  * @file    Demonstrations/Adafruit_LCD_1_8_SD_Joystick/Src/stm32f1xx_it.c
+  * @file    USB_Device/HID_Standalone/Src/stm32f1xx_it.c 
   * @author  MCD Application Team
   * @version V1.3.0
   * @date    18-December-2015
@@ -48,8 +48,11 @@
   */
 
 /* Includes ------------------------------------------------------------------*/
-#include "main.h"
-#include "stm32f1xx_it.h"
+#include "stm32f1xx_it.h"    
+
+/** @addtogroup Validation_Project
+  * @{
+  */
 
 /* Private typedef -----------------------------------------------------------*/
 /* Private define ------------------------------------------------------------*/
@@ -57,14 +60,9 @@
 
 /* Private macro -------------------------------------------------------------*/
 /* Private variables ---------------------------------------------------------*/
-extern uint8_t BlinkSpeed;
+extern PCD_HandleTypeDef hpcd;
 /* UART handler declared in "main.c" file */
 extern UART_HandleTypeDef UartHandle;
-/* USB_Device and HID_Buffer declared in "main.c" file */
-extern PCD_HandleTypeDef hpcd;
-extern USBD_HandleTypeDef USBD_Device;
-extern uint8_t HID_Buffer[4];
-uint32_t tick_cnt = 0;
 
 /* Private function prototypes -----------------------------------------------*/
 /* Private functions ---------------------------------------------------------*/
@@ -74,7 +72,7 @@ uint32_t tick_cnt = 0;
 /******************************************************************************/
 
 /**
-  * @brief  This function handles NMI exception.
+  * @brief   This function handles NMI exception.
   * @param  None
   * @retval None
   */
@@ -89,9 +87,8 @@ void NMI_Handler(void)
   */
 void HardFault_Handler(void)
 {
-    volatile char q = 1;
   /* Go to infinite loop when Hard Fault exception occurs */
-  while (q)
+  while (1)
   {
   }
 }
@@ -163,38 +160,13 @@ void PendSV_Handler(void)
 }
 
 /**
-  * @brief  Gets Pointer Data.
-  * @param  pbuf: Pointer to report
-  * @retval None
-  */
-static void GetPointerData(uint8_t *pbuf)
-{
-  static int8_t cnt = 0;
-  int8_t  x = 0, y = 0 ;
-  
-  if(cnt++ > 0)
-  {
-    x = CURSOR_STEP;
-  }
-  else
-  {
-    x = -CURSOR_STEP;
-  }
-  
-  pbuf[0] = 0;
-  pbuf[1] = x;
-  pbuf[2] = y;
-  pbuf[3] = 0;
-}
-
-/**
   * @brief  This function handles SysTick Handler.
   * @param  None
   * @retval None
   */
 void SysTick_Handler(void)
 {
-    HAL_IncTick();
+  HAL_IncTick();
 }
 
 /******************************************************************************/
@@ -214,16 +186,6 @@ void SysTick_Handler(void)
 void USARTx_IRQHandler(void)
 {
   HAL_UART_IRQHandler(&UartHandle);
-}
-
-/**
-  * @brief  This function handles lines 10 to 15 interrupt request.
-  * @param  None
-  * @retval None
-  */
-void EXTI15_10_IRQHandler(void)
-{
-  HAL_GPIO_EXTI_IRQHandler(USER_BUTTON_PIN);
 }
 
 /**
@@ -247,12 +209,17 @@ void USBWakeUp_IRQHandler(void)
 }
 
 /**
-  * @brief  This function handles PPP interrupt request.
+  * @brief  This function handles external lines interrupt request.
   * @param  None
   * @retval None
   */
-/*void PPP_IRQHandler(void)
+void EXTI15_10_IRQHandler(void)
 {
-}*/
+  HAL_GPIO_EXTI_IRQHandler(USER_BUTTON_PIN);
+}
+
+/**
+  * @}
+  */ 
 
 /************************ (C) COPYRIGHT STMicroelectronics *****END OF FILE****/

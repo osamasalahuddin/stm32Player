@@ -9,11 +9,16 @@
 #include <stdlib.h>
 #include "VS1053.h"
 
-/* FatFs includes component */
+/* FatFs include components */
 #include "ff_gen_drv.h"
 #include "sd_diskio.h"
 #include "fatfs_storage.h"
 
+/* Usb include components */
+#include "usbd_core.h"
+#include "stm32f1xx_hal_pcd.h"
+#include "usbd_desc.h"
+#include "usbd_hid.h"
 
 /* Exported types ------------------------------------------------------------*/
 /* Exported constants --------------------------------------------------------*/

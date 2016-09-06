@@ -1,6 +1,6 @@
 /**
   ******************************************************************************
-  * @file    Demonstrations/Adafruit_LCD_1_8_SD_Joystick/Inc/stm32f1xx_it.h 
+  * @file    USB_Device/HID_Standalone/Inc/stm32f1xx_it.h 
   * @author  MCD Application Team
   * @version V1.3.0
   * @date    18-December-2015
@@ -50,10 +50,12 @@
 #define __STM32F1xx_IT_H
 
 #ifdef __cplusplus
-extern "C" {
-#endif
+ extern "C" {
+#endif 
 
 /* Includes ------------------------------------------------------------------*/
+#include "main.h"    
+
 /* Exported types ------------------------------------------------------------*/
 /* Exported constants --------------------------------------------------------*/
 /* Exported macro ------------------------------------------------------------*/
@@ -68,8 +70,6 @@ void SVC_Handler(void);
 void DebugMon_Handler(void);
 void PendSV_Handler(void);
 void SysTick_Handler(void);
-void OTG_FS_IRQHandler(void);
-void SDIO_IRQHandler(void);
 void USB_LP_CAN1_RX0_IRQHandler(void);
 void USBWakeUp_IRQHandler(void);
 void EXTI15_10_IRQHandler(void);
